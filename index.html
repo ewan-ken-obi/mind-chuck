@@ -389,10 +389,11 @@ function flush() {
   saveQueue();
   api(inflight).then(function () {
     inflight = null; flushing = false; saveQueue();
-    sync.at = new Date();
+    sync.at = new Date(); sync.err = '';
     flush();
   }).catch(function (e) {
     queue.unshift(inflight); inflight = null; flushing = false; saveQueue();
+    sync.err = e.message;
     setSync(/key/i.test(e.message) ? 'badkey' : /unknown table|missing tab/i.test(e.message) ? 'backend' : 'offline');
     setTimeout(flush, 15000);
   });
@@ -1220,6 +1221,7 @@ function openSettings() {
     h('div', { class: 'dlg' },
       h('h2', { text: 'Connect to your Google Sheet' }),
       h('p', { text: 'Paste your Apps Script web app URL and key. They are saved in this browser only — do this once on each device.' }),
+      sync.err && sync.state !== 'idle' ? h('p', { style: 'color:var(--over)', text: 'Last error from the Sheet: ' + sync.err + ((queue.length + (inflight ? 1 : 0)) ? '  (' + (queue.length + (inflight ? 1 : 0)) + ' changes waiting)' : '') }) : null,
       h('label', { text: 'Web app URL' }), url,
       h('label', { text: 'Key' }), key,
       err,
