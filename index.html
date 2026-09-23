@@ -10,21 +10,22 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%23141619%22/><path d=%22M9 16.5l4.5 4.5L23 11%22 stroke=%22%236fcf97%22 stroke-width=%223%22 fill=%22none%22 stroke-linecap=%22round%22/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* ---------- colours: dark (default, from the Claude Design mockup) ---------- */
 :root{
   --bg:#101113; --panel:#16181b; --bar:#141619; --raised:#1a1c1f; --card:#1b1e22;
-  --line:#23262b; --line2:#2c3037; --hover:rgba(255,255,255,.035); --focus:#1f2b24;
-  --ink:#e8e9ea; --ink2:#aeb4bb; --ink3:#8b9299; --ink4:#6a7078;
+  --line:#2a2e34; --line2:#343941; --hover:rgba(255,255,255,.06); --stripe:rgba(255,255,255,.025); --focus:#1f2b24;
+  --ink:#eef0f1; --ink2:#c6cbd1; --ink3:#a3aab2; --ink4:#7d848c;
   --accent:#6fcf97; --accent-ink:#0f1113; --over:#f2777a;
   --shadow:0 18px 48px rgba(0,0,0,.45);
-  --f:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f:'Atkinson Hyperlegible Next','Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 :root[data-theme="light"]{
   --bg:#eef0f2; --panel:#ffffff; --bar:#f7f8f9; --raised:#f2f3f5; --card:#ffffff;
-  --line:#e2e5e9; --line2:#d3d7dc; --hover:rgba(0,0,0,.025); --focus:#e7f5ec;
-  --ink:#1b1d20; --ink2:#454a50; --ink3:#666c73; --ink4:#9399a0;
+  --line:#dde1e5; --line2:#cdd2d8; --hover:rgba(0,0,0,.045); --stripe:#f7f8fa; --focus:#e7f5ec;
+  --ink:#15171a; --ink2:#3a3f45; --ink3:#565c63; --ink4:#80868d;
   --accent:#1e8e4e; --accent-ink:#ffffff; --over:#c9302c;
   --shadow:0 12px 36px rgba(20,24,30,.10);
 }
@@ -40,7 +41,7 @@ a{color:var(--accent)}
 
 /* ---------- frame ---------- */
 .shell{min-height:100vh;padding:12px;display:flex;justify-content:center}
-.frame{width:100%;max-width:1600px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:calc(100vh - 24px)}
+.frame{width:100%;max-width:1600px;border:1px solid var(--line);border-radius:12px;overflow:clip;background:var(--panel);box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:calc(100vh - 24px)}
 .top{display:flex;align-items:center;gap:8px;background:var(--bar);padding:13px 16px;border-bottom:1px solid var(--line)}
 .brand{font:600 15px/1 var(--f);letter-spacing:-.01em;white-space:nowrap}
 .crumb{font:500 12.5px/1 var(--f);color:var(--ink4);padding:3px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
@@ -68,33 +69,34 @@ a{color:var(--accent)}
 
 /* ---------- Mind Chuck task table ---------- */
 .mind{flex:1;display:flex;flex-direction:column}
-.thead{display:flex;background:var(--bar);border-bottom:1px solid var(--line)}
+.thead{display:flex;background:var(--bar);border-bottom:1px solid var(--line2);position:sticky;top:0;z-index:3}
 .th{padding:8px 10px;font:600 12.5px/1 var(--f);color:var(--ink);border-left:1px solid var(--line)}
 .w-grip{width:26px;flex:none}.w-chk{width:22px;flex:none}
 .w-main{flex:1;min-width:0}
 .w-status{width:132px;flex:none}.w-project{width:100px;flex:none}.w-who{width:96px;flex:none}.w-date{width:84px;flex:none}.w-x{width:28px;flex:none}
 .thead .w-grip,.thead .w-chk,.thead .w-x{border-left:0;padding:0}
 .row{display:flex;align-items:stretch;border-bottom:1px solid var(--line);background:var(--panel)}
-.row:hover{background:var(--hover)}
+.mind>.row:nth-child(odd){background:var(--stripe)}
+.mind>.row:hover{background:var(--hover)}
 .row.over{box-shadow:inset 3px 0 0 var(--over)}
 .row.dropping{box-shadow:inset 0 2px 0 var(--accent)}
-.grip{padding:12px 0 0 8px;opacity:.35;font:400 12px/1 var(--f);color:var(--ink4);cursor:grab;user-select:none}
+.grip{padding:15px 0 0 8px;opacity:.35;font:400 12px/1 var(--f);color:var(--ink4);cursor:grab;user-select:none}
 .row:hover .grip{opacity:1}
-.chkcell{display:flex;align-items:flex-start;padding-top:11px}
-.chk{width:16px;height:16px;flex:none;border-radius:4px;border:1px solid var(--line2);background:var(--card);display:flex;align-items:center;justify-content:center;font:600 10px/1 var(--f);color:transparent;cursor:pointer;padding:0}
+.chkcell{display:flex;align-items:flex-start;padding-top:14px}
+.chk{width:17px;height:17px;flex:none;border-radius:4px;border:1.5px solid var(--ink4);background:var(--card);display:flex;align-items:center;justify-content:center;font:600 10px/1 var(--f);color:transparent;cursor:pointer;padding:0}
 .chk:focus-visible{outline:none;box-shadow:0 0 0 2px var(--accent)}
 .chk.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.main{padding:8px 10px 9px;border-left:1px solid var(--line)}
-.ttext{font:500 15px/1.5 var(--f);color:var(--ink);word-break:break-word}
+.main{padding:10px 10px 11px;border-left:1px solid var(--line)}
+.ttext{font:500 17px/1.45 var(--f);color:var(--ink);word-break:break-word}
 .row.done .ttext{color:var(--ink4);text-decoration:line-through}
-.tnote{font:400 12.5px/1.5 var(--f);color:var(--ink3);margin-top:1px;white-space:pre-wrap;word-break:break-word}
+.tnote{font:400 13px/1.5 var(--f);color:var(--ink3);margin-top:1px;white-space:pre-wrap;word-break:break-word}
 .tnote:empty{display:none}
 .row:focus-within .tnote:empty{display:block}
-.meta{padding:10px;border-left:1px solid var(--line);font:500 13px/1.4 var(--f);letter-spacing:.03em;color:var(--ink2);word-break:break-word}
+.meta{padding:11px 10px;border-left:1px solid var(--line);font:500 14px/1.4 var(--f);letter-spacing:.03em;color:var(--ink2);word-break:break-word}
 .meta.status.set{color:var(--accent)}
 .row.done .meta,.row.done .meta.status,.row.done .tnote{color:var(--ink4)}
 .row.done .meta.status select{color:var(--ink4)}
-.meta.who{color:var(--ink3)}
+.meta.who{color:var(--ink2)}
 .meta.date.over{color:var(--over)}
 .msp{display:none}
 .meta.status{padding:0}
@@ -122,13 +124,17 @@ option{background:var(--panel);color:var(--ink)}
 .caprow{display:flex;align-items:stretch}
 .capmain{display:flex;flex-direction:column;border-left:1px solid var(--line)}
 .capmain input{border:0;background:transparent;outline:none;color:var(--ink)}
-.cin-task{font:400 15px/1.5 var(--f);padding:8px 10px 2px}
+.cin-task{font:400 17px/1.45 var(--f);padding:8px 10px 2px}
 .cin-note{font:400 12.5px/1.5 var(--f)!important;color:var(--ink3)!important;padding:0 10px 9px}
 .cin-meta{padding:10px;border:0;border-left:1px solid var(--line);background:transparent;font:500 13px/1.4 var(--f);color:var(--ink2);outline:none;min-width:0}
 .cap input:focus{background:var(--focus)}
 .ghostbox{width:15px;height:15px;border-radius:4px;border:1px dashed var(--line2)}
 .capact{display:flex;align-items:center;gap:12px;padding:12px 10px 14px 58px}
 .primary{background:var(--accent);color:var(--accent-ink);font:600 14px/1 var(--f);border:0;border-radius:8px;padding:10px 16px;cursor:pointer;white-space:nowrap}
+.capbtn{flex:none;width:48px;display:flex;justify-content:center;padding-top:7px}
+.chuckbtn{width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--ink);border:1px solid var(--line2);font:600 11px/1 var(--f);border-radius:7px;padding:0;cursor:pointer;white-space:nowrap}
+.chuckbtn:hover{border-color:var(--ink4)}
+.chuckbtn:active,.chuckbtn.pressed{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .hint{font:500 12.5px/1.6 var(--f);color:var(--ink3)}
 
 /* ---------- project pages ---------- */
@@ -251,20 +257,18 @@ option{background:var(--panel);color:var(--ink)}
   .row .meta{order:4;width:auto;flex:none;border-left:0;padding:0 12px 9px 4px;font-size:11.5px;max-width:100%}
   .row .meta:empty{display:none}
   .row:focus-within .meta:empty{display:block}
-  .ttext{font-size:15px}
+  .ttext{font-size:16px}
   .cap{flex:none;min-height:0}
   .row .meta.blank{display:none}
   .row:focus-within .meta.blank{display:block}
   .meta.status select{padding:0 12px 9px 4px}
   .caprow{flex-wrap:wrap}
-  .caprow>.w-grip{display:none}
-  .caprow>.w-chk{width:38px;padding-left:14px}
-  .capmain{flex:1 1 calc(100% - 38px);border-left:0}
+  .capbtn{width:38px;padding:7px 0 0 4px}
+  .chuckbtn{width:34px;height:34px;font-size:9.5px}
+  .capmain{flex:1 1 calc(100% - 38px);min-width:0;border-left:0}
   .cin-task{font-size:15px;padding:9px 8px 2px}
   .cin-meta{flex:1 1 25%;width:auto!important;border-left:0;border-top:1px solid var(--line);font-size:12px;padding:9px 8px}
   .cin-meta+.cin-meta{border-left:1px solid var(--line)}
-  .capact{padding:10px 12px}
-  .capact .primary{flex:1}
   .hint{display:none}
   .kgrid{grid-template-columns:1fr}
   .kbody{min-height:0}
@@ -889,10 +893,9 @@ function composer() {
 
   var cap = h('div', { class: 'cap', onclick: function (e) { if (e.target === cap) F.text.focus(); } },
     h('div', { class: 'caprow' },
-      h('div', { class: 'w-grip' }),
-      h('div', { class: 'w-chk chkcell', style: 'padding-top:9px' }, h('div', { class: 'ghostbox' })),
+      h('div', { class: 'capbtn' }, h('button', { class: 'chuckbtn', text: 'Chuck', title: 'Chuck it (Enter)', onclick: chuck })),
       h('div', { class: 'capmain w-main' },
-        field('text', 'cin-task', 'Chuck a task — tab through the fields', { enterkeyhint: 'done' }),
+        field('text', 'cin-task', 'Task to Chuck', { enterkeyhint: 'done' }),
         field('note', 'cin-note', 'Notes')
       ),
       (function () {
@@ -912,10 +915,6 @@ function composer() {
         onblur: function (e) { if ((ui.draft.date || '') !== e.target.value) return; var v = parseDue(e.target.value); e.target.value = v; ui.draft.date = v; saveUi(); } }),
       h('div', { class: 'w-x' }),
       dl
-    ),
-    h('div', { class: 'capact' },
-      h('button', { class: 'primary', text: 'Chuck it', onclick: chuck }),
-      h('div', { class: 'hint' }, 'Tab through the fields · Enter chucks it · ↑ jumps into the list · #235 @dillon !fri work in the task · Date: t = today')
     )
   );
   return cap;
@@ -941,6 +940,9 @@ function chuck() {
   saveUi();
   focusAfter = 'input[data-cap=text]';
   render(true);
+  // brief green flash so Enter feels like pressing the button
+  var cb = document.querySelector('.chuckbtn');
+  if (cb) { cb.classList.add('pressed'); setTimeout(function () { cb.classList.remove('pressed'); }, 180); }
 }
 
 /* ---------------- Projects ---------------- */
@@ -1208,7 +1210,13 @@ function openSettings() {
   var url = h('input', { value: cfg.url, placeholder: 'https://script.google.com/macros/s/…/exec', autocomplete: 'off', spellcheck: 'false' });
   var key = h('input', { value: cfg.key, placeholder: 'The KEY from your Code.gs', type: 'password', autocomplete: 'off' });
   var err = h('div', { class: 'err' });
-  var veil = h('div', { class: 'veil', onclick: function (e) { if (e.target === veil) close(); } },
+  // Only close when the click both starts and ends on the dark background,
+  // so drag-selecting text in a field (and releasing outside) doesn't close it.
+  var downOnVeil = false;
+  var veil = h('div', { class: 'veil',
+    onmousedown: function (e) { downOnVeil = e.target === veil; },
+    onclick: function (e) { if (e.target === veil && downOnVeil) close(); downOnVeil = false; },
+    onkeydown: function (e) { if (e.key === 'Escape') close(); } },
     h('div', { class: 'dlg' },
       h('h2', { text: 'Connect to your Google Sheet' }),
       h('p', { text: 'Paste your Apps Script web app URL and key. They are saved in this browser only — do this once on each device.' }),
