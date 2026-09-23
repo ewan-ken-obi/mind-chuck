@@ -30,7 +30,7 @@
   --shadow:0 12px 36px rgba(20,24,30,.10);
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased}
+html,body{margin:0;background:#313f2c;color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased}
 button,input{font-family:var(--f)}
 [contenteditable]{outline:none;border-radius:3px;-webkit-user-modify:read-write-plaintext-only}
 [contenteditable]:focus{background:var(--focus);box-shadow:0 0 0 1px var(--accent)}
@@ -190,9 +190,7 @@ option{background:var(--panel);color:var(--ink)}
 .sb-title{font:500 15px/1.5 var(--f);color:var(--ink)}
 .sb-note{font:400 12.5px/1.5 var(--f);color:var(--ink3);white-space:pre-wrap}
 .sb-note:empty{display:none}.sb:focus-within .sb-note:empty{display:block}
-.sb-bic{width:140px;flex:none;padding:0}
-.sb-bic input{width:100%;height:100%;border:0;background:transparent;color:inherit;font:inherit;padding:10px;outline:none;min-width:0}
-.sb-bic input:focus{background:var(--focus)}
+.sb-bic{width:140px;flex:none}
 .sb-st{width:180px;flex:none;padding:0}
 .sb-st select{appearance:none;-webkit-appearance:none;width:100%;border:0;background:transparent;color:inherit;font:inherit;padding:10px;cursor:pointer;outline:none}
 .sb-st select:focus{background:var(--focus)}
@@ -290,7 +288,8 @@ option{background:var(--panel);color:var(--ink)}
   .sb-bic{margin-left:44px;width:110px}
   .sb-st{flex:1 1 auto}
   .sb-since{margin-left:44px}
-  .sb-bic input,.sb-st select{padding:0 8px 10px 0}
+  .sb-bic{padding:0 8px 10px 0}
+  .sb-st select{padding:0 8px 10px 0}
   .sb-since,.sb-days{padding:0 8px 10px 0}
 }
 </style>
@@ -1100,7 +1099,7 @@ function submittalLog(nb) {
     ),
     h('div', { class: 'sb h' },
       h('div', { class: 'sb-num', text: '#' }), h('div', { class: 'sb-main', text: 'Submittal' }),
-      h('div', { class: 'sb-bic', style: 'padding:8px 10px', text: 'Ball in court' }), h('div', { class: 'sb-st', style: 'padding:8px 10px', text: 'Status' }),
+      h('div', { class: 'sb-bic', text: 'Ball in court' }), h('div', { class: 'sb-st', style: 'padding:8px 10px', text: 'Status' }),
       h('div', { class: 'sb-since', text: 'Since' }), h('div', { class: 'sb-days', text: 'Days' }), h('div', { class: 'sb-x', style: 'padding:0' })),
     list.map(submittalRow),
     drafting ? h('div', { class: 'sb' },
@@ -1114,17 +1113,14 @@ function submittalLog(nb) {
       var n = all.reduce(function (a, x) { var v = numVal(x.num); return v < 1e9 ? Math.max(a, v) : a; }, 0) + 1;
       newSub = { project: nb.id, num: String(n).padStart(2, '0') };
       focusAfter = '.sbdraft'; render(true);
-    } }),
-    h('datalist', { id: 'biclist' }, BIC_PICKS.map(function (b) { return h('option', { value: b }); }))
+    } })
   ));
 }
 function submittalRow(x) {
   var days = subDays(x), closed = subClosed(x);
   var late = !closed && /^(submitted|under review)$/i.test(x.status || '') && days !== null && days >= LATE_DAYS;
   var stamp = function (changes) { changes.since = md(today()); patch('submittals', x.id, changes); };
-  var bic = h('input', { value: x.bic || '', list: 'biclist', placeholder: 'Who', autocomplete: 'off',
-    onchange: function () { var v = bic.value.trim(); if (v !== (x.bic || '')) { stamp({ bic: v }); later(); } },
-    onkeydown: function (e) { if (e.key === 'Enter') { e.preventDefault(); bic.blur(); } } });
+  var bic = edit('div', 'sbc sb-bic', x.bic, function (v) { stamp({ bic: v }); }, { ph: 'Who' });
   var opts = SUB_STATUSES.slice(); if (x.status && opts.indexOf(x.status) < 0) opts.unshift(x.status);
   var st = h('select', { title: 'Status', onchange: function () { remember('submittals', x.id, 'Status changed'); stamp({ status: st.value }); render(); } },
     h('option', { value: '', text: '—' }), opts.map(function (o) { return h('option', { value: o, text: o }); }));
@@ -1141,7 +1137,7 @@ function submittalRow(x) {
       }, { ph: 'Submittal', spell: true }),
       edit('div', 'sb-note', x.note, function (v) { patch('submittals', x.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true })),
     h('button', { class: 'sb-x', title: 'Delete', text: '×', onclick: function () { remember('submittals', x.id, 'Submittal deleted'); remove('submittals', x.id); render(); } }),
-    h('div', { class: 'sbc sb-bic' }, bic),
+    bic,
     h('div', { class: 'sbc sb-st' + stCls }, st),
     sinceEl,
     h('div', { class: 'sbc sb-days' + (late ? ' late' : ''), title: late ? 'In review ' + days + ' days' : '', text: closed || days === null ? '—' : String(days) })
