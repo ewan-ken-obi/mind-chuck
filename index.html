@@ -10,8 +10,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%23141619%22/><path d=%22M9 16.5l4.5 4.5L23 11%22 stroke=%22%236fcf97%22 stroke-width=%223%22 fill=%22none%22 stroke-linecap=%22round%22/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ---------- colours: dark (default, from the Claude Design mockup) ---------- */
 :root{
@@ -20,7 +19,7 @@
   --ink:#eef0f1; --ink2:#c6cbd1; --ink3:#a3aab2; --ink4:#7d848c;
   --accent:#6fcf97; --accent-ink:#0f1113; --over:#f2777a;
   --shadow:0 18px 48px rgba(0,0,0,.45);
-  --f:'Atkinson Hyperlegible Next','Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 :root[data-theme="light"]{
   --bg:#eef0f2; --panel:#ffffff; --bar:#f7f8f9; --raised:#f2f3f5; --card:#ffffff;
@@ -53,6 +52,7 @@ a{color:var(--accent)}
 .eyebtn{border:0;background:transparent;color:var(--ink4);cursor:pointer;padding:2px;display:flex;border-radius:4px}
 .eyebtn:hover{color:var(--ink);background:var(--hover)}
 .eyebtn.on{color:var(--accent)}
+.eyebtn:disabled{opacity:.35;cursor:default}
 .tbtn.on{border-color:var(--accent);color:var(--accent)}
 .tbtn:hover{color:var(--ink);border-color:var(--line2)}
 
@@ -80,18 +80,18 @@ a{color:var(--accent)}
 .mind>.row:hover{background:var(--hover)}
 .row.over{box-shadow:inset 3px 0 0 var(--over)}
 .row.dropping{box-shadow:inset 0 2px 0 var(--accent)}
-.grip{padding:15px 0 0 8px;opacity:.35;font:400 12px/1 var(--f);color:var(--ink4);cursor:grab;user-select:none}
+.grip{padding:13px 0 0 8px;opacity:.35;font:400 12px/1 var(--f);color:var(--ink4);cursor:grab;user-select:none}
 .row:hover .grip{opacity:1}
-.chkcell{display:flex;align-items:flex-start;padding-top:14px}
+.chkcell{display:flex;align-items:flex-start;padding-top:12px}
 .chk{width:17px;height:17px;flex:none;border-radius:4px;border:1.5px solid var(--ink4);background:var(--card);display:flex;align-items:center;justify-content:center;font:600 10px/1 var(--f);color:transparent;cursor:pointer;padding:0}
 .chk:focus-visible{outline:none;box-shadow:0 0 0 2px var(--accent)}
 .chk.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .main{padding:10px 10px 11px;border-left:1px solid var(--line)}
-.ttext{font:500 17px/1.45 var(--f);color:var(--ink);word-break:break-word}
+.ttext{font:500 15.5px/1.45 var(--f);color:var(--ink);word-break:break-word}
 .row.done .ttext{color:var(--ink4);text-decoration:line-through}
 .tnote{font:400 13px/1.5 var(--f);color:var(--ink3);margin-top:1px;white-space:pre-wrap;word-break:break-word}
 .tnote:empty{display:none}
-.row:focus-within .tnote:empty{display:block}
+.row:focus-within:not(:has(.chk:focus)) .tnote:empty{display:block}
 .meta{padding:11px 10px;border-left:1px solid var(--line);font:500 14px/1.4 var(--f);letter-spacing:.03em;color:var(--ink2);word-break:break-word}
 .meta.status.set{color:var(--accent)}
 .row.done .meta,.row.done .meta.status,.row.done .tnote{color:var(--ink4)}
@@ -124,7 +124,7 @@ option{background:var(--panel);color:var(--ink)}
 .caprow{display:flex;align-items:stretch}
 .capmain{display:flex;flex-direction:column;border-left:1px solid var(--line)}
 .capmain input{border:0;background:transparent;outline:none;color:var(--ink)}
-.cin-task{font:400 17px/1.45 var(--f);padding:8px 10px 2px}
+.cin-task{font:400 15.5px/1.45 var(--f);padding:8px 10px 2px}
 .cin-note{font:400 12.5px/1.5 var(--f)!important;color:var(--ink3)!important;padding:0 10px 9px}
 .cin-meta{padding:10px;border:0;border-left:1px solid var(--line);background:transparent;font:500 13px/1.4 var(--f);color:var(--ink2);outline:none;min-width:0}
 .cap input:focus{background:var(--focus)}
@@ -254,11 +254,11 @@ option{background:var(--panel);color:var(--ink)}
   .row .msp{display:block;order:3;width:38px;flex:none}
   .row .meta{order:4;width:auto;flex:none;border-left:0;padding:0 12px 9px 4px;font-size:11.5px;max-width:100%}
   .row .meta:empty{display:none}
-  .row:focus-within .meta:empty{display:block}
-  .ttext{font-size:16px}
+  .row:focus-within:not(:has(.chk:focus)) .meta:empty{display:block}
+  .ttext{font-size:15px}
   .cap{flex:none;min-height:0}
   .row .meta.blank{display:none}
-  .row:focus-within .meta.blank{display:block}
+  .row:focus-within:not(:has(.chk:focus)) .meta.blank{display:block}
   .meta.status select{padding:0 12px 9px 4px}
   .caprow{flex-wrap:wrap}
   .capbtn{width:38px;padding:7px 0 0 4px}
@@ -321,7 +321,7 @@ function emptyDb() { return { tasks: [], projects: [], cards: [], notes: [], row
 var db = Object.assign(emptyDb(), LS.get('mc.db', {}));
 var queue = LS.get('mc.queue', []);
 var cfg = LS.get('mc.cfg', { url: '', key: '' });
-var ui = Object.assign({ nav: 'mind', sub: {}, hideDone: false, archive: false, theme: 'dark',
+var ui = Object.assign({ nav: 'mind', sub: {}, archive: false, theme: 'dark',
   draft: { text: '', status: '', project: '', who: '', date: '', note: '' } }, LS.get('mc.ui', {}));
 var sync = { state: 'idle', at: null };
 var edits = 0, inflight = null, flushing = false, pendingRender = false, dragTask = null, dragCard = null, dragTab = null;
@@ -400,7 +400,7 @@ function flush() {
 function normalize(kind, r) {
   var o = {};
   for (var k in r) o[k] = r[k] == null ? '' : String(r[k]);
-  if (kind === 'tasks') o.done = /^true$/i.test(o.done);
+  if (kind === 'tasks') { o.done = /^true$/i.test(o.done); o.archived = /^true$/i.test(o.archived); }
   o.order = num(o.order);
   return o;
 }
@@ -595,9 +595,8 @@ function topBar(nb) {
     crumb,
     h('div', { class: 'spacer' }),
     h('div', { class: 'stat', text: nb ? activeSub(nb) : open.length + ' open · ' + waiting + ' waiting' }),
-    nb ? null : h('button', { class: 'tbtn mob-only' + (ui.hideDone ? ' on' : ''), title: 'Show or hide checked-off tasks',
-      text: ui.hideDone ? 'Show checked (' + db.tasks.filter(function (t) { return t.done; }).length + ')' : 'Hide checked',
-      onclick: function () { ui.hideDone = !ui.hideDone; saveUi(); render(); } }),
+    nb || ui.archive ? null : h('button', { class: 'tbtn mob-only' + (checkedOnList().length ? ' on' : ''), title: 'Move checked tasks to the Archive',
+      text: 'Archive checked (' + checkedOnList().length + ')', onclick: archiveChecked }),
     h('button', { class: 'tbtn', id: 'syncbtn', title: 'Sync settings', onclick: openSettings, text: syncLabel() }),
     h('button', { class: 'tbtn', title: 'Light / dark', text: ui.theme === 'light' ? 'Dark' : 'Light',
       onclick: function () { ui.theme = ui.theme === 'light' ? 'dark' : 'light'; saveUi(); render(); } })
@@ -675,9 +674,10 @@ function footer(nb) {
   var cells = nb ? [h('div', { class: 'fc', text: nb.name })] : [];
   if (nb) cells.push(h('div', { class: 'fc', text: activeSub(nb) }));
   else {
-    var done = db.tasks.filter(function (t) { return t.done; }).length;
-    cells.push(h('div', { class: 'fc', text: (db.tasks.length - done) + ' open · ' + done + ' checked' }));
-    cells.push(h('button', { class: 'fc btn', text: ui.archive ? '← Back to list' : 'Archive (' + done + ')',
+    var arch = db.tasks.filter(function (t) { return t.archived; }).length;
+    var open = db.tasks.filter(function (t) { return !t.done; }).length;
+    cells.push(h('div', { class: 'fc', text: open + ' open · ' + checkedOnList().length + ' checked' }));
+    cells.push(h('button', { class: 'fc btn', text: ui.archive ? '← Back to list' : 'Archive (' + arch + ')',
       onclick: function () { ui.archive = !ui.archive; saveUi(); render(); window.scrollTo(0, 0); } }));
   }
   cells.push(h('div', { class: 'spacer' }));
@@ -688,15 +688,15 @@ function footer(nb) {
 /* ---------------- Undo (Ctrl+Z, or the Undo button in the pop-up) ---------------- */
 var undoStack = [], toastTimer = null;
 function remember(kind, id, label) {
-  var r = find(kind, id);
-  undoStack.push({ kind: kind, id: id, before: r ? Object.assign({}, r) : null });
+  var ids = Array.isArray(id) ? id : [id];
+  undoStack.push(ids.map(function (i) { var r = find(kind, i); return { kind: kind, id: i, before: r ? Object.assign({}, r) : null }; }));
   if (undoStack.length > 50) undoStack.shift();
   toast(label);
 }
 function undo() {
-  var u = undoStack.pop();
-  if (!u) return;
-  if (u.before) put(u.kind, u.before); else remove(u.kind, u.id);
+  var group = undoStack.pop();
+  if (!group) return;
+  group.forEach(function (u) { if (u.before) put(u.kind, u.before); else remove(u.kind, u.id); });
   toast(null);
   render();
 }
@@ -719,7 +719,7 @@ document.addEventListener('keydown', function (e) {
 /* ---------------- Archive: every checked task, grouped by week closed (newest first) ---------------- */
 function fromIso(s) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
 function archiveView() {
-  var done = db.tasks.filter(function (t) { return t.done; }).sort(function (a, b) {
+  var done = db.tasks.filter(function (t) { return t.archived; }).sort(function (a, b) {
     return String(b.closed || '').localeCompare(String(a.closed || '')) || num(b.order) - num(a.order);
   });
   var groups = [], byKey = {};
@@ -750,7 +750,7 @@ function archiveRow(t) {
     h('div', { class: 'chkcell w-chk' },
       h('button', { class: 'chk on', title: 'Uncheck (back to open)', text: '✓', onclick: function () {
         remember('tasks', t.id, 'Task unchecked');
-        patch('tasks', t.id, { done: false, status: /^done$/i.test(t.status) ? '' : t.status, closed: '' });
+        patch('tasks', t.id, { done: false, archived: false, status: /^done$/i.test(t.status) ? '' : t.status, closed: '' });
         render();
       } })),
     h('div', { class: 'main w-main' },
@@ -765,23 +765,28 @@ function archiveRow(t) {
 }
 
 /* ---------------- Mind Chuck (task table) ---------------- */
-// Eye icon above the checkboxes: hide / show checked-off tasks
-function hideDoneBtn() {
-  var n = db.tasks.filter(function (t) { return t.done; }).length;
-  var b = h('button', { class: 'eyebtn' + (ui.hideDone ? ' on' : ''),
-    title: ui.hideDone ? 'Show checked tasks (' + n + ' hidden)' : 'Hide checked tasks (' + n + ')',
-    onclick: function () { ui.hideDone = !ui.hideDone; saveUi(); render(); } });
-  b.innerHTML = ui.hideDone
-    ? '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><path d="M2.5 13.5l11-11"/></svg>'
-    : '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/></svg>';
+// Filter button: moves every checked task off the list and into the Archive
+function checkedOnList() { return db.tasks.filter(function (t) { return t.done && !t.archived; }); }
+function archiveChecked() {
+  var list = checkedOnList();
+  if (!list.length) return;
+  remember('tasks', list.map(function (t) { return t.id; }), list.length + ' task' + (list.length > 1 ? 's' : '') + ' archived');
+  list.forEach(function (t) { patch('tasks', t.id, { archived: true, closed: t.closed || iso(today()) }); });
+  render();
+}
+function filterBtn() {
+  var n = checkedOnList().length;
+  var b = h('button', { class: 'eyebtn' + (n ? ' on' : ''), disabled: n ? null : 'disabled',
+    title: n ? 'Archive ' + n + ' checked task' + (n > 1 ? 's' : '') : 'Nothing checked to archive', onclick: archiveChecked });
+  b.innerHTML = '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M2 3h12l-4.5 5.5V13l-3-1.5V8.5z"/></svg>';
   return b;
 }
 function mindView() {
   if (ui.archive) return archiveView();
-  var tasks = db.tasks.slice().sort(byOrder).filter(function (t) { return !ui.hideDone || !t.done; });
+  var tasks = db.tasks.slice().sort(byOrder).filter(function (t) { return !t.archived; });
   return h('div', { class: 'mind' },
     h('div', { class: 'thead' },
-      h('div', { class: 'th w-grip' }), h('div', { class: 'th w-chk hchk' }, hideDoneBtn()),
+      h('div', { class: 'th w-grip' }), h('div', { class: 'th w-chk hchk' }, filterBtn()),
       h('div', { class: 'th w-main', text: 'Task' }),
       h('div', { class: 'th w-status', text: 'Status' }),
       h('div', { class: 'th w-project', text: 'Project' }),
