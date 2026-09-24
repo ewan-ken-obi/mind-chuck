@@ -77,7 +77,12 @@ a{color:var(--accent)}
 .thead .w-grip,.thead .w-chk,.thead .w-x{border-left:0;padding:0}
 .row{display:flex;align-items:stretch;border-bottom:1px solid var(--rule);background:var(--panel)}
 .mind>.row:hover{background:var(--hover)}
-.row.over{box-shadow:inset 3px 0 0 var(--accent)}
+.row{position:relative}
+.row.prio{box-shadow:inset 4px 0 0 var(--accent)}
+.row.prio.done{box-shadow:none}
+.pbar{position:absolute;left:0;top:0;bottom:0;width:8px;cursor:pointer;z-index:1}
+.pbar:hover{background:var(--accent);opacity:.35}
+.row.prio .pbar:hover{opacity:0}
 .row.dropping{box-shadow:inset 0 2px 0 var(--accent)}
 .grip{padding:13px 0 0 8px;opacity:.35;font:400 12px/1 var(--f);color:var(--ink4);cursor:grab;user-select:none}
 .row:hover .grip{opacity:1}
@@ -110,7 +115,7 @@ select.cin-meta.w-status.blank{color:var(--ink4)}
 option{background:var(--panel);color:var(--ink)}
 .x{order:10;border:0;background:transparent;color:var(--ink4);cursor:pointer;font:400 15px/1 var(--f);opacity:0;padding:8px 0 0}
 .row .meta:empty::before{content:none}
-.row:focus-within .meta:empty::before{content:attr(data-ph)}
+.row:focus-within:not(:has(.chk:focus)) .meta:empty::before{content:attr(data-ph)}
 .row:hover .x,.x:focus-visible{opacity:1}
 .x:hover{color:var(--ink)}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:flex;align-items:center;gap:14px;background:var(--raised);border:1px solid var(--line2);color:var(--ink);font:500 13px/1 var(--f);padding:10px 12px 10px 16px;border-radius:10px;box-shadow:var(--shadow);z-index:60}
@@ -259,6 +264,7 @@ option{background:var(--panel);color:var(--ink)}
   .row{flex-wrap:wrap}
   .row .w-grip{display:none}
   .row .w-chk{width:32px;padding-left:10px;padding-top:9px;order:0}
+  .pbar{width:9px}
   .chk{width:15px;height:15px}
   .row .main{order:1;flex:1 1 calc(100% - 32px - 28px);border-left:0;padding:6px 4px 3px}
   .row .x{order:2;width:28px;padding:8px 0 0;font-size:14px}
@@ -419,7 +425,7 @@ function flush() {
 function normalize(kind, r) {
   var o = {};
   for (var k in r) o[k] = r[k] == null ? '' : String(r[k]);
-  if (kind === 'tasks') { o.done = /^true$/i.test(o.done); o.archived = /^true$/i.test(o.archived); }
+  if (kind === 'tasks') { o.done = /^true$/i.test(o.done); o.archived = /^true$/i.test(o.archived); o.priority = /^true$/i.test(o.priority); }
   o.order = num(o.order);
   return o;
 }
@@ -820,7 +826,7 @@ function mindView() {
 }
 
 function taskRow(t, list, idx) {
-  var row = h('div', { class: 'row' + (t.done ? ' done' : '') + (isOver(t) ? ' over' : ''), 'data-id': t.id,
+  var row = h('div', { class: 'row' + (t.done ? ' done' : '') + (t.priority ? ' prio' : ''), 'data-id': t.id,
     ondragover: function (e) { if (!dragTask) return; e.preventDefault(); row.classList.add('dropping'); },
     ondragleave: function () { row.classList.remove('dropping'); },
     ondrop: function (e) {
@@ -850,7 +856,10 @@ function taskRow(t, list, idx) {
     edit('div', 'ttext', t.text, function (v) { if (v) patch('tasks', t.id, { text: v }); else { remember('tasks', t.id, 'Task deleted'); remove('tasks', t.id); } }, { ph: 'Task', spell: true }),
     edit('div', 'tnote', t.note, function (v) { patch('tasks', t.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true })
   );
-  add(row, [grip, chk, main,
+  // Thin strip on the far left: click to turn priority on/off (green bar)
+  var pbar = h('div', { class: 'pbar', title: t.priority ? 'Priority — click to remove' : 'Click to mark as priority',
+    onclick: function () { remember('tasks', t.id, t.priority ? 'Priority removed' : 'Marked priority'); patch('tasks', t.id, { priority: !t.priority }); render(true); } });
+  add(row, [pbar, grip, chk, main,
     h('button', { class: 'x w-x', title: 'Delete', text: '×', onclick: function () { remember('tasks', t.id, 'Task deleted'); remove('tasks', t.id); render(); } }),
     h('div', { class: 'msp' }),
     h('div', { class: 'meta status w-status' + (t.status ? ' set' : ' blank') }, statusSelect(t.status, '', function (v) {
