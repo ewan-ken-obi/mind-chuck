@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#141619">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Mind Chuck">
-<title>Mind Chuck</title>
+<meta name="apple-mobile-web-app-title" content="Mind Palace">
+<title>Obi-Wan's Mind Palace</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%23141619%22/><path d=%22M9 16.5l4.5 4.5L23 11%22 stroke=%22%236fcf97%22 stroke-width=%223%22 fill=%22none%22 stroke-linecap=%22round%22/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,7 @@
 /* ---------- colours: dark (default, from the Claude Design mockup) ---------- */
 :root{
   --bg:#101113; --panel:#16181b; --bar:#141619; --raised:#1a1c1f; --card:#1b1e22;
-  --line:#2a2e34; --line2:#343941; --hover:rgba(255,255,255,.06); --stripe:rgba(255,255,255,.025); --focus:#1f2b24;
+  --line:#2a2e34; --line2:#343941; --hover:rgba(255,255,255,.06); --rule:#3b4149; --soft:rgba(255,255,255,.035); --focus:#1f2b24;
   --ink:#eef0f1; --ink2:#c6cbd1; --ink3:#a3aab2; --ink4:#7d848c;
   --accent:#6fcf97; --accent-ink:#0f1113; --over:#f2777a;
   --shadow:0 18px 48px rgba(0,0,0,.45);
@@ -23,7 +23,7 @@
 }
 :root[data-theme="light"]{
   --bg:#eef0f2; --panel:#ffffff; --bar:#f7f8f9; --raised:#f2f3f5; --card:#ffffff;
-  --line:#dde1e5; --line2:#cdd2d8; --hover:rgba(0,0,0,.045); --stripe:#f7f8fa; --focus:#e7f5ec;
+  --line:#dde1e5; --line2:#cdd2d8; --hover:rgba(0,0,0,.045); --rule:#c5cad1; --soft:#f0f2f4; --focus:#e7f5ec;
   --ink:#15171a; --ink2:#3a3f45; --ink3:#565c63; --ink4:#80868d;
   --accent:#1e8e4e; --accent-ink:#ffffff; --over:#c9302c;
   --shadow:0 12px 36px rgba(20,24,30,.10);
@@ -43,7 +43,7 @@ a{color:var(--accent)}
 .frame{width:100%;max-width:1600px;border:1px solid var(--line);border-radius:12px;overflow:clip;background:var(--panel);box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:calc(100vh - 24px)}
 .top{display:flex;align-items:center;gap:8px;background:var(--bar);padding:13px 16px;border-bottom:1px solid var(--line)}
 .brand{font:600 15px/1 var(--f);letter-spacing:-.01em;white-space:nowrap}
-.crumb{font:500 12.5px/1 var(--f);color:var(--ink4);padding:3px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.crumb{font:600 13px/1 var(--f);color:var(--accent);padding:3px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
 .spacer{flex:1}
 .stat{font:500 12.5px/1 var(--f);color:var(--ink3);white-space:nowrap}
 .tbtn{border:1px solid var(--line);background:transparent;color:var(--ink3);font:500 11.5px/1 var(--f);border-radius:999px;padding:5px 10px;cursor:pointer;white-space:nowrap}
@@ -69,35 +69,34 @@ a{color:var(--accent)}
 
 /* ---------- Mind Chuck task table ---------- */
 .mind{flex:1;display:flex;flex-direction:column}
-.thead{display:flex;background:var(--bar);border-bottom:1px solid var(--line2);position:sticky;top:0;z-index:3}
-.th{padding:8px 10px;font:600 12.5px/1 var(--f);color:var(--ink);border-left:1px solid var(--line)}
+.thead{display:flex;background:var(--bar);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:3}
+.th{padding:8px 10px;font:600 12.5px/1 var(--f);color:var(--ink);border-left:1px solid var(--soft)}
 .w-grip{width:26px;flex:none}.w-chk{width:22px;flex:none}
 .w-main{flex:1;min-width:0}
 .w-status{width:132px;flex:none}.w-project{width:100px;flex:none}.w-who{width:96px;flex:none}.w-date{width:84px;flex:none}.w-x{width:28px;flex:none}
 .thead .w-grip,.thead .w-chk,.thead .w-x{border-left:0;padding:0}
-.row{display:flex;align-items:stretch;border-bottom:1px solid var(--line);background:var(--panel)}
-.mind>.row:nth-child(odd){background:var(--stripe)}
+.row{display:flex;align-items:stretch;border-bottom:1px solid var(--rule);background:var(--panel)}
 .mind>.row:hover{background:var(--hover)}
-.row.over{box-shadow:inset 3px 0 0 var(--over)}
+.row.over{box-shadow:inset 3px 0 0 var(--accent)}
 .row.dropping{box-shadow:inset 0 2px 0 var(--accent)}
 .grip{padding:13px 0 0 8px;opacity:.35;font:400 12px/1 var(--f);color:var(--ink4);cursor:grab;user-select:none}
 .row:hover .grip{opacity:1}
 .chkcell{display:flex;align-items:flex-start;padding-top:12px}
-.chk{width:17px;height:17px;flex:none;border-radius:4px;border:1.5px solid var(--ink4);background:var(--card);display:flex;align-items:center;justify-content:center;font:600 10px/1 var(--f);color:transparent;cursor:pointer;padding:0}
+.chk{width:17px;height:17px;flex:none;border-radius:4px;border:1.5px solid var(--accent);background:var(--card);display:flex;align-items:center;justify-content:center;font:600 10px/1 var(--f);color:transparent;cursor:pointer;padding:0}
 .chk:focus-visible{outline:none;box-shadow:0 0 0 2px var(--accent)}
 .chk.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.main{padding:10px 10px 11px;border-left:1px solid var(--line)}
+.main{padding:10px 10px 11px;border-left:1px solid var(--soft)}
 .ttext{font:500 15.5px/1.45 var(--f);color:var(--ink);word-break:break-word}
 .row.done .ttext{color:var(--ink4);text-decoration:line-through}
 .tnote{font:400 13px/1.5 var(--f);color:var(--ink3);margin-top:1px;white-space:pre-wrap;word-break:break-word}
 .tnote:empty{display:none}
 .row:focus-within:not(:has(.chk:focus)) .tnote:empty{display:block}
-.meta{padding:11px 10px;border-left:1px solid var(--line);font:500 14px/1.4 var(--f);letter-spacing:.03em;color:var(--ink2);word-break:break-word}
-.meta.status.set{color:var(--accent)}
+.meta{padding:11px 10px;border-left:1px solid var(--soft);font:500 14px/1.4 var(--f);letter-spacing:.03em;color:var(--ink2);word-break:break-word}
+.meta.status.set{color:var(--ink2)}
 .row.done .meta,.row.done .meta.status,.row.done .tnote{color:var(--ink4)}
 .row.done .meta.status select{color:var(--ink4)}
 .meta.who{color:var(--ink2)}
-.meta.date.over{color:var(--over)}
+.meta.date.over{color:inherit}
 .msp{display:none}
 .meta.status{padding:0}
 .row .meta.status select{height:auto}
@@ -106,7 +105,7 @@ a{color:var(--accent)}
 .meta.status.blank select{color:transparent}
 .row:hover .meta.status.blank select,.row:focus-within .meta.status.blank select{color:var(--ink4)}
 select.cin-meta.blank{color:var(--ink4)}
-select.cin-meta.w-status{width:132px;height:auto;font:500 13px/1.4 var(--f);color:var(--ink2);border-left:1px solid var(--line)}
+select.cin-meta.w-status{width:132px;height:auto;font:500 13px/1.4 var(--f);color:var(--ink2);border-left:1px solid var(--soft)}
 select.cin-meta.w-status.blank{color:var(--ink4)}
 option{background:var(--panel);color:var(--ink)}
 .x{order:10;border:0;background:transparent;color:var(--ink4);cursor:pointer;font:400 15px/1 var(--f);opacity:0;padding:8px 0 0}
@@ -122,11 +121,11 @@ option{background:var(--panel);color:var(--ink)}
 
 .cap{flex:1;min-height:180px;cursor:text;display:flex;flex-direction:column;border-top:1px solid var(--line2);background:var(--panel)}
 .caprow{display:flex;align-items:stretch}
-.capmain{display:flex;flex-direction:column;border-left:1px solid var(--line)}
+.capmain{display:flex;flex-direction:column;border-left:1px solid var(--soft)}
 .capmain input{border:0;background:transparent;outline:none;color:var(--ink)}
 .cin-task{font:400 15.5px/1.45 var(--f);padding:8px 10px 2px}
 .cin-note{font:400 12.5px/1.5 var(--f)!important;color:var(--ink3)!important;padding:0 10px 9px}
-.cin-meta{padding:10px;border:0;border-left:1px solid var(--line);background:transparent;font:500 13px/1.4 var(--f);color:var(--ink2);outline:none;min-width:0}
+.cin-meta{padding:10px;border:0;border-left:1px solid var(--soft);background:transparent;font:500 13px/1.4 var(--f);color:var(--ink2);outline:none;min-width:0}
 .cap input:focus{background:var(--focus)}
 .ghostbox{width:15px;height:15px;border-radius:4px;border:1px dashed var(--line2)}
 .capact{display:flex;align-items:center;gap:12px;padding:12px 10px 14px 58px}
@@ -588,10 +587,10 @@ function topBar(nb) {
   var waiting = open.filter(function (t) { return /^waiting/i.test(t.status); }).length;
   var crumb = nb
     ? edit('div', 'crumb', nb.name, function (v) { if (v) patch('projects', nb.id, { name: v }); }, { ph: 'Project name' })
-    : null;
-  if (crumb) crumb.id = 'crumb';
+    : h('div', { class: 'crumb', text: ui.archive ? 'Mind Chuck · Archive' : 'Mind Chuck' });
+  if (nb) crumb.id = 'crumb';
   return h('div', { class: 'top' },
-    h('div', { class: 'brand', text: 'Mind Chuck' }),
+    h('div', { class: 'brand', text: "OBI-WAN'S MIND PALACE" }),
     crumb,
     h('div', { class: 'spacer' }),
     h('div', { class: 'stat', text: nb ? activeSub(nb) : open.length + ' open · ' + waiting + ' waiting' }),
