@@ -36,7 +36,8 @@ button,input{font-family:var(--f)}
 .rich b,.rich strong{font-weight:700}
 .rich .tg,.rich font[color="#00a000"],.rich [style*="rgb(0, 160, 0)"]{color:var(--accent)!important}
 .rich .tr,.rich font[color="#d00000"],.rich [style*="rgb(208, 0, 0)"]{color:var(--over)!important}
-.rich font[color="#000001"],.rich [style*="rgb(0, 0, 1)"]{color:inherit!important}
+.rich font[color="#000001"],.rich [style*="rgb(0, 0, 1)"]{color:var(--base,var(--ink))!important}
+.ebody{--base:var(--ink)}.tnote,.sb-note{--base:var(--ink3)}
 .fmt{display:flex;gap:2px}
 .fmt button{width:26px;height:24px;border:1px solid var(--line);background:transparent;color:var(--ink2);border-radius:5px;cursor:pointer;font:600 12.5px/1 var(--f);padding:0}
 .fmt button:hover{color:var(--ink);border-color:var(--line2)}
@@ -590,36 +591,64 @@ function mdToHtml(s) {
     .replace(/\*\*([\s\S]+?)\*\*/g, '<b>$1</b>')
     .replace(/__([\s\S]+?)__/g, '<u>$1</u>')
     .replace(/\*([^*\n]+?)\*/g, '<i>$1</i>')
-    .replace(/\[green\]([\s\S]+?)\[\/green\]/g, '<span class="tg">$1</span>')
-    .replace(/\[red\]([\s\S]+?)\[\/red\]/g, '<span class="tr">$1</span>')
+    .replace(/\[green\]([\s\S]+?)\[\/green\]/g, '<font color="#00a000">$1</font>')
+    .replace(/\[red\]([\s\S]+?)\[\/red\]/g, '<font color="#d00000">$1</font>')
     .replace(/\n/g, '<br>');
 }
 function htmlToMd(root) {
-  function walk(n, top) {
-    if (n.nodeType === 3) return n.nodeValue.replace(/ /g, ' ');
-    if (n.nodeType !== 1) return '';
-    var tag = n.tagName;
-    if (tag === 'BR') return '\n';
-    var kids = Array.prototype.map.call(n.childNodes, function (c) { return walk(c, false); }).join('');
-    var st = n.style || {};
-    var wrap = function (m, t) { var a = t.match(/^\s*/)[0], z = t.match(/\s*$/)[0], core = t.trim(); return core ? a + m + core + m + z : t; };
-    if (tag === 'B' || tag === 'STRONG' || /^(bold|[6-9]00)$/.test(st.fontWeight || '')) kids = wrap('**', kids);
-    if (tag === 'I' || tag === 'EM' || st.fontStyle === 'italic') kids = wrap('*', kids);
-    if (tag === 'U' || /underline/.test(st.textDecoration || st.textDecorationLine || '')) kids = wrap('__', kids);
-    var col = (n.getAttribute('color') || '').toLowerCase(), cls = n.classList || { contains: function () { return false; } };
+  // Flatten the note into runs of text with one style each (innermost colour wins,
+  // "normal" colour cancels green/red), then write them back out as markers.
+  var runs = [];
+  function colorOf(n) {
+    var st = n.style || {}, c = (n.getAttribute && n.getAttribute('color') || '').toLowerCase();
     var sc = (st.color || '').replace(/\s/g, '');
-    if (sc === 'rgb(0,160,0)') col = '#00a000'; else if (sc === 'rgb(208,0,0)') col = '#d00000';
-    var inGreen = function (t) { var a = t.match(/^\s*/)[0], z = t.match(/\s*$/)[0], c = t.trim(); return c ? a + '[green]' + c + '[/green]' + z : t; };
-    var inRed = function (t) { var a = t.match(/^\s*/)[0], z = t.match(/\s*$/)[0], c = t.trim(); return c ? a + '[red]' + c + '[/red]' + z : t; };
-    if (col === '#00a000' || cls.contains('tg')) kids = inGreen(kids);
-    if (col === '#d00000' || cls.contains('tr')) kids = inRed(kids);
-    if (!top && (tag === 'DIV' || tag === 'P')) {
-      if (n.childNodes.length === 1 && n.firstChild.tagName === 'BR') return '\n';
-      return '\n' + kids;
-    }
-    return kids;
+    if (c === '#00a000' || sc === 'rgb(0,160,0)' || (n.classList && n.classList.contains('tg'))) return 'green';
+    if (c === '#d00000' || sc === 'rgb(208,0,0)' || (n.classList && n.classList.contains('tr'))) return 'red';
+    if (c === '#000001' || sc === 'rgb(0,0,1)') return '';
+    return undefined;
   }
-  return walk(root, true).replace(/^\n/, '');
+  function walk(n, sty, top) {
+    if (n.nodeType === 3) { runs.push({ t: n.nodeValue.replace(/ /g, ' '), s: sty }); return; }
+    if (n.nodeType !== 1) return;
+    var tag = n.tagName, st = n.style || {};
+    if (tag === 'BR') { runs.push({ t: '\n', s: {} }); return; }
+    var s2 = { b: sty.b, i: sty.i, u: sty.u, c: sty.c };
+    if (tag === 'B' || tag === 'STRONG' || /^(bold|[6-9]00)$/.test(st.fontWeight || '')) s2.b = true;
+    if (/^(normal|[1-4]00)$/.test(st.fontWeight || '')) s2.b = false;
+    if (tag === 'I' || tag === 'EM' || st.fontStyle === 'italic') s2.i = true;
+    if (st.fontStyle === 'normal') s2.i = false;
+    if (tag === 'U' || /underline/.test(st.textDecoration || st.textDecorationLine || '')) s2.u = true;
+    var c = colorOf(n); if (c !== undefined) s2.c = c;
+    var kids = n.childNodes;
+    if (!top && (tag === 'DIV' || tag === 'P')) {
+      runs.push({ t: '\n', s: {} });
+      if (kids.length === 1 && kids[0].tagName === 'BR') return;
+    }
+    for (var k = 0; k < kids.length; k++) walk(kids[k], s2, false);
+  }
+  walk(root, {}, true);
+  // split on newlines and merge neighbours with the same style
+  var parts = [];
+  runs.forEach(function (r) {
+    r.t.split('\n').forEach(function (piece, idx) {
+      if (idx > 0) parts.push({ t: '\n', s: null });
+      if (piece) parts.push({ t: piece, s: r.s });
+    });
+  });
+  var same = function (a, b) { return a && b && !!a.b === !!b.b && !!a.i === !!b.i && !!a.u === !!b.u && (a.c || '') === (b.c || ''); };
+  var merged = [];
+  parts.forEach(function (p) { var last = merged[merged.length - 1]; if (last && p.s && same(last.s, p.s)) last.t += p.t; else merged.push({ t: p.t, s: p.s }); });
+  var out = merged.map(function (p) {
+    if (!p.s) return p.t;
+    var a = p.t.match(/^\s*/)[0], core = p.t.trim(), z = core ? p.t.match(/\s*$/)[0] : '';
+    if (!core) return p.t;
+    if (p.s.u) core = '__' + core + '__';
+    if (p.s.i) core = '*' + core + '*';
+    if (p.s.b) core = '**' + core + '**';
+    if (p.s.c) core = '[' + p.s.c + ']' + core + '[/' + p.s.c + ']';
+    return a + core + z;
+  }).join('');
+  return out.replace(/^\n/, '');
 }
 function isEditing() {
   var a = document.activeElement, app = document.getElementById('app');
@@ -906,8 +935,8 @@ function taskRow(t, list, idx) {
         render(true);
       } }));
   var main = h('div', { class: 'main w-main' },
-    edit('div', 'ttext', t.text, function (v) { if (v) patch('tasks', t.id, { text: v }); else { remember('tasks', t.id, 'Task deleted'); remove('tasks', t.id); } }, { ph: 'Task', spell: true }),
-    edit('div', 'tnote', t.note, function (v) { patch('tasks', t.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true, rich: true })
+    edit('div', 'ttext', t.text, function (v) { if (v) { remember('tasks', t.id, 'Task edited'); patch('tasks', t.id, { text: v }); } else { remember('tasks', t.id, 'Task deleted'); remove('tasks', t.id); } }, { ph: 'Task', spell: true }),
+    edit('div', 'tnote', t.note, function (v) { remember('tasks', t.id, 'Note edited'); patch('tasks', t.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true, rich: true })
   );
   // Thin strip on the far left: click to turn priority on/off (green bar)
   var pbar = h('div', { class: 'pbar', title: t.priority ? 'Priority — click to remove' : 'Click to mark as priority',
@@ -1221,7 +1250,7 @@ function submittalRow(x) {
         if (v) patch('submittals', x.id, { title: v });
         else { remember('submittals', x.id, 'Submittal deleted'); remove('submittals', x.id); }
       }, { ph: 'Submittal', spell: true }),
-      edit('div', 'sb-note', x.note, function (v) { patch('submittals', x.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true, rich: true })),
+      edit('div', 'sb-note', x.note, function (v) { remember('submittals', x.id, 'Note edited'); patch('submittals', x.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true, rich: true })),
     h('button', { class: 'sb-x', title: 'Delete', text: '×', onclick: function () { remember('submittals', x.id, 'Submittal deleted'); remove('submittals', x.id); render(); } }),
     bic,
     h('div', { class: 'sbc sb-st' + stCls }, st),
@@ -1292,13 +1321,14 @@ function notebook(nb, key) {
       edit('div', 'ebody', '', function (v) {
         if (!v.trim()) return;
         var max = db.notes.reduce(function (a, x) { return Math.max(a, num(x.order)); }, 0);
-        put('notes', { id: uid(), project: nb.id, sub: key, date: label, body: v, order: max + 1 });
+        var nid = uid(); remember('notes', nid, 'Entry added');
+        put('notes', { id: nid, project: nb.id, sub: key, date: label, body: v, order: max + 1 });
       }, { multi: true, spell: true, rich: true, ph: 'Write here — it saves when you click away.' })
     ),
     entries.map(function (en) {
       return h('div', { class: 'entry' },
         edit('div', 'edate', en.date, function (v) { patch('notes', en.id, { date: v || en.date }); }, { ph: 'Date' }),
-        edit('div', 'ebody', en.body, function (v) { if (v.trim()) patch('notes', en.id, { body: v }); else remove('notes', en.id); }, { multi: true, spell: true, rich: true })
+        edit('div', 'ebody', en.body, function (v) { remember('notes', en.id, v.trim() ? 'Entry edited' : 'Entry deleted'); if (v.trim()) patch('notes', en.id, { body: v }); else remove('notes', en.id); }, { multi: true, spell: true, rich: true })
       );
     }),
     h('div', { class: 'tail', onclick: focusTop },
