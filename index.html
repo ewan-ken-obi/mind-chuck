@@ -34,6 +34,9 @@ button,input{font-family:var(--f)}
 [contenteditable]{outline:none;border-radius:3px;-webkit-user-modify:read-write-plaintext-only}
 [contenteditable].rich{-webkit-user-modify:read-write}
 .rich b,.rich strong{font-weight:700}
+.rich .tg,.rich font[color="#00a000"],.rich [style*="rgb(0, 160, 0)"]{color:var(--accent)!important}
+.rich .tr,.rich font[color="#d00000"],.rich [style*="rgb(208, 0, 0)"]{color:var(--over)!important}
+.rich font[color="#000001"],.rich [style*="rgb(0, 0, 1)"]{color:inherit!important}
 .fmt{display:flex;gap:2px}
 .fmt button{width:26px;height:24px;border:1px solid var(--line);background:transparent;color:var(--ink2);border-radius:5px;cursor:pointer;font:600 12.5px/1 var(--f);padding:0}
 .fmt button:hover{color:var(--ink);border-color:var(--line2)}
@@ -587,6 +590,8 @@ function mdToHtml(s) {
     .replace(/\*\*([\s\S]+?)\*\*/g, '<b>$1</b>')
     .replace(/__([\s\S]+?)__/g, '<u>$1</u>')
     .replace(/\*([^*\n]+?)\*/g, '<i>$1</i>')
+    .replace(/\[green\]([\s\S]+?)\[\/green\]/g, '<span class="tg">$1</span>')
+    .replace(/\[red\]([\s\S]+?)\[\/red\]/g, '<span class="tr">$1</span>')
     .replace(/\n/g, '<br>');
 }
 function htmlToMd(root) {
@@ -601,6 +606,13 @@ function htmlToMd(root) {
     if (tag === 'B' || tag === 'STRONG' || /^(bold|[6-9]00)$/.test(st.fontWeight || '')) kids = wrap('**', kids);
     if (tag === 'I' || tag === 'EM' || st.fontStyle === 'italic') kids = wrap('*', kids);
     if (tag === 'U' || /underline/.test(st.textDecoration || st.textDecorationLine || '')) kids = wrap('__', kids);
+    var col = (n.getAttribute('color') || '').toLowerCase(), cls = n.classList || { contains: function () { return false; } };
+    var sc = (st.color || '').replace(/\s/g, '');
+    if (sc === 'rgb(0,160,0)') col = '#00a000'; else if (sc === 'rgb(208,0,0)') col = '#d00000';
+    var inGreen = function (t) { var a = t.match(/^\s*/)[0], z = t.match(/\s*$/)[0], c = t.trim(); return c ? a + '[green]' + c + '[/green]' + z : t; };
+    var inRed = function (t) { var a = t.match(/^\s*/)[0], z = t.match(/\s*$/)[0], c = t.trim(); return c ? a + '[red]' + c + '[/red]' + z : t; };
+    if (col === '#00a000' || cls.contains('tg')) kids = inGreen(kids);
+    if (col === '#d00000' || cls.contains('tr')) kids = inRed(kids);
     if (!top && (tag === 'DIV' || tag === 'P')) {
       if (n.childNodes.length === 1 && n.firstChild.tagName === 'BR') return '\n';
       return '\n' + kids;
@@ -1250,10 +1262,18 @@ function fmtBar() {
     return h('button', { title: tip, style: style, text: label,
       onmousedown: function (e) { e.preventDefault(); if (document.activeElement && document.activeElement.classList.contains('rich')) document.execCommand(cmd); } });
   };
+  // colour buttons: the odd hex codes are markers that get saved as [green]…[/green] / [red]…[/red]
+  var col = function (hex, swatch, tip) {
+    return h('button', { title: tip, style: 'color:' + swatch, text: 'A',
+      onmousedown: function (e) { e.preventDefault(); if (document.activeElement && document.activeElement.classList.contains('rich')) { document.execCommand('styleWithCSS', false, false); document.execCommand('foreColor', false, hex); } } });
+  };
   return h('div', { class: 'fmt' },
     b('bold', 'B', 'font-weight:800', 'Bold (Ctrl+B)'),
     b('italic', 'I', 'font-style:italic', 'Italic (Ctrl+I)'),
-    b('underline', 'U', 'text-decoration:underline', 'Underline (Ctrl+U)'));
+    b('underline', 'U', 'text-decoration:underline', 'Underline (Ctrl+U)'),
+    col('#00a000', 'var(--accent)', 'Green text'),
+    col('#d00000', 'var(--over)', 'Red text'),
+    col('#000001', 'var(--ink)', 'Normal colour'));
 }
 function notebook(nb, key) {
   var entries = db.notes.filter(function (n) { return n.project === nb.id && n.sub === key; })
