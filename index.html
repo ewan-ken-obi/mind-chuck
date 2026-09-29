@@ -32,6 +32,11 @@
 html,body{margin:0;background:#313f2c;color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased}
 button,input{font-family:var(--f)}
 [contenteditable]{outline:none;border-radius:3px;-webkit-user-modify:read-write-plaintext-only}
+[contenteditable].rich{-webkit-user-modify:read-write}
+.rich b,.rich strong{font-weight:700}
+.fmt{display:flex;gap:2px}
+.fmt button{width:26px;height:24px;border:1px solid var(--line);background:transparent;color:var(--ink2);border-radius:5px;cursor:pointer;font:600 12.5px/1 var(--f);padding:0}
+.fmt button:hover{color:var(--ink);border-color:var(--line2)}
 [contenteditable]:focus{background:var(--focus);box-shadow:0 0 0 1px var(--accent)}
 [contenteditable]:empty::before{content:attr(data-ph);color:var(--ink4);pointer-events:none}
 ::selection{background:var(--accent);color:var(--accent-ink)}
@@ -546,27 +551,63 @@ function add(el, c) {
 function edit(tag, cls, value, onSave, opt) {
   opt = opt || {};
   value = value == null ? '' : String(value);
-  var el = h(tag, { class: cls, contenteditable: PLAIN ? 'plaintext-only' : 'true', spellcheck: opt.spell ? 'true' : 'false', 'data-ph': opt.ph || '' });
-  if (value) el.textContent = value;
+  var rich = !!opt.rich;
+  var el = h(tag, { class: cls + (rich ? ' rich' : ''), contenteditable: PLAIN && !rich ? 'plaintext-only' : 'true', spellcheck: opt.spell ? 'true' : 'false', 'data-ph': opt.ph || '' });
+  var show = function (v) { if (rich) el.innerHTML = mdToHtml(v); else el.textContent = v; };
+  if (value) show(value);
   var cancelled = false;
   el.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && (!opt.multi || e.metaKey || e.ctrlKey)) { e.preventDefault(); el.blur(); }
-    if (e.key === 'Escape') { cancelled = true; el.textContent = value; el.blur(); }
+    if (e.key === 'Escape') { cancelled = true; show(value); el.blur(); }
+    if (rich && (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+      var k = e.key.toLowerCase(), c = k === 'b' ? 'bold' : k === 'i' ? 'italic' : k === 'u' ? 'underline' : null;
+      if (c) { e.preventDefault(); document.execCommand(c); }
+    }
   });
   el.addEventListener('paste', function (e) {
-    if (PLAIN) return;
+    if (PLAIN && !rich) return;
     e.preventDefault();
     var t = (e.clipboardData || window.clipboardData).getData('text');
     document.execCommand('insertText', false, opt.multi ? t : t.replace(/\s*\n\s*/g, ' '));
   });
   el.addEventListener('blur', function () {
     if (cancelled) { cancelled = false; return; }
-    var v = (opt.multi ? el.innerText : el.textContent).replace(/ /g, ' ');
+    var v = rich ? htmlToMd(el) : (opt.multi ? el.innerText : el.textContent).replace(/ /g, ' ');
     v = opt.multi ? v.replace(/\s+$/, '') : v.replace(/\s+/g, ' ').trim();
-    if (!v && el.firstChild) el.textContent = '';
+    if (!v.replace(/[*_\s]/g, '')) v = '';
+    if (!v && el.firstChild) el.innerHTML = '';
     if (v !== value) { value = v; onSave(v); later(); }
   });
   return el;
+}
+/* Bold / italic / underline are stored in the Sheet as **bold**, *italic*, __underline__ */
+function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function mdToHtml(s) {
+  return escHtml(String(s || ''))
+    .replace(/\*\*([\s\S]+?)\*\*/g, '<b>$1</b>')
+    .replace(/__([\s\S]+?)__/g, '<u>$1</u>')
+    .replace(/\*([^*\n]+?)\*/g, '<i>$1</i>')
+    .replace(/\n/g, '<br>');
+}
+function htmlToMd(root) {
+  function walk(n, top) {
+    if (n.nodeType === 3) return n.nodeValue.replace(/ /g, ' ');
+    if (n.nodeType !== 1) return '';
+    var tag = n.tagName;
+    if (tag === 'BR') return '\n';
+    var kids = Array.prototype.map.call(n.childNodes, function (c) { return walk(c, false); }).join('');
+    var st = n.style || {};
+    var wrap = function (m, t) { var a = t.match(/^\s*/)[0], z = t.match(/\s*$/)[0], core = t.trim(); return core ? a + m + core + m + z : t; };
+    if (tag === 'B' || tag === 'STRONG' || /^(bold|[6-9]00)$/.test(st.fontWeight || '')) kids = wrap('**', kids);
+    if (tag === 'I' || tag === 'EM' || st.fontStyle === 'italic') kids = wrap('*', kids);
+    if (tag === 'U' || /underline/.test(st.textDecoration || st.textDecorationLine || '')) kids = wrap('__', kids);
+    if (!top && (tag === 'DIV' || tag === 'P')) {
+      if (n.childNodes.length === 1 && n.firstChild.tagName === 'BR') return '\n';
+      return '\n' + kids;
+    }
+    return kids;
+  }
+  return walk(root, true).replace(/^\n/, '');
 }
 function isEditing() {
   var a = document.activeElement, app = document.getElementById('app');
@@ -854,7 +895,7 @@ function taskRow(t, list, idx) {
       } }));
   var main = h('div', { class: 'main w-main' },
     edit('div', 'ttext', t.text, function (v) { if (v) patch('tasks', t.id, { text: v }); else { remember('tasks', t.id, 'Task deleted'); remove('tasks', t.id); } }, { ph: 'Task', spell: true }),
-    edit('div', 'tnote', t.note, function (v) { patch('tasks', t.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true })
+    edit('div', 'tnote', t.note, function (v) { patch('tasks', t.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true, rich: true })
   );
   // Thin strip on the far left: click to turn priority on/off (green bar)
   var pbar = h('div', { class: 'pbar', title: t.priority ? 'Priority — click to remove' : 'Click to mark as priority',
@@ -1168,7 +1209,7 @@ function submittalRow(x) {
         if (v) patch('submittals', x.id, { title: v });
         else { remember('submittals', x.id, 'Submittal deleted'); remove('submittals', x.id); }
       }, { ph: 'Submittal', spell: true }),
-      edit('div', 'sb-note', x.note, function (v) { patch('submittals', x.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true })),
+      edit('div', 'sb-note', x.note, function (v) { patch('submittals', x.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true, rich: true })),
     h('button', { class: 'sb-x', title: 'Delete', text: '×', onclick: function () { remember('submittals', x.id, 'Submittal deleted'); remove('submittals', x.id); render(); } }),
     bic,
     h('div', { class: 'sbc sb-st' + stCls }, st),
@@ -1203,6 +1244,17 @@ function sheet(nb, sub) {
 }
 
 /* Notebook (dated entries, newest on top, page never ends) */
+// B / I / U buttons (Ctrl+B / Ctrl+I / Ctrl+U also work in any note)
+function fmtBar() {
+  var b = function (cmd, label, style, tip) {
+    return h('button', { title: tip, style: style, text: label,
+      onmousedown: function (e) { e.preventDefault(); if (document.activeElement && document.activeElement.classList.contains('rich')) document.execCommand(cmd); } });
+  };
+  return h('div', { class: 'fmt' },
+    b('bold', 'B', 'font-weight:800', 'Bold (Ctrl+B)'),
+    b('italic', 'I', 'font-style:italic', 'Italic (Ctrl+I)'),
+    b('underline', 'U', 'text-decoration:underline', 'Underline (Ctrl+U)'));
+}
 function notebook(nb, key) {
   var entries = db.notes.filter(function (n) { return n.project === nb.id && n.sub === key; })
     .sort(function (a, b) { return num(b.order) - num(a.order); });
@@ -1212,6 +1264,7 @@ function notebook(nb, key) {
     h('div', { class: 'nbhead' },
       h('div', { class: 'lbl', text: key === 'Meeting notes' ? 'Notebook' : key }),
       h('div', { class: 'spacer' }),
+      fmtBar(),
       h('button', { class: 'newbtn', text: 'New entry', onclick: focusTop })
     ),
     h('div', { class: 'entry first' },
@@ -1220,12 +1273,12 @@ function notebook(nb, key) {
         if (!v.trim()) return;
         var max = db.notes.reduce(function (a, x) { return Math.max(a, num(x.order)); }, 0);
         put('notes', { id: uid(), project: nb.id, sub: key, date: label, body: v, order: max + 1 });
-      }, { multi: true, spell: true, ph: 'Write here — it saves when you click away.' })
+      }, { multi: true, spell: true, rich: true, ph: 'Write here — it saves when you click away.' })
     ),
     entries.map(function (en) {
       return h('div', { class: 'entry' },
         edit('div', 'edate', en.date, function (v) { patch('notes', en.id, { date: v || en.date }); }, { ph: 'Date' }),
-        edit('div', 'ebody', en.body, function (v) { if (v.trim()) patch('notes', en.id, { body: v }); else remove('notes', en.id); }, { multi: true, spell: true })
+        edit('div', 'ebody', en.body, function (v) { if (v.trim()) patch('notes', en.id, { body: v }); else remove('notes', en.id); }, { multi: true, spell: true, rich: true })
       );
     }),
     h('div', { class: 'tail', onclick: focusTop },
