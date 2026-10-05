@@ -169,6 +169,9 @@ option{background:var(--panel);color:var(--ink)}
 .kcard.lead{box-shadow:inset 3px 0 0 var(--accent)}
 .ktext{font:400 13.5px/1.5 var(--f);color:var(--ink);padding-right:30px;word-break:break-word}
 .kwho{font:500 10px/1 var(--f);color:var(--ink3);margin-top:7px;letter-spacing:.03em}
+.knote{font:400 12px/1.5 var(--f);color:var(--ink3);margin-top:3px;white-space:pre-wrap;word-break:break-word;--base:var(--ink3)}
+.knote:empty{display:none}
+.kcard:focus-within .knote:empty,.kcard:hover .knote:empty{display:block}
 .kwho span{padding:1px 2px}
 .ktools{position:absolute;top:6px;right:6px;display:flex;gap:2px;opacity:0}
 .kcard:hover .ktools{opacity:1}
@@ -459,7 +462,7 @@ function pull(force) {
         KINDS.forEach(function (k) { db[k].forEach(function (r) { queue.push({ action: 'upsert', table: TABLE[k], row: r }); }); });
         saveQueue(); flush(); return;
       }
-      db = fresh; saveDb(); migrateOrder();
+      db = fresh; saveDb(); migrateOrder(); ensurePersonal();
       sync.at = new Date(); setSync('idle');
       render();
     })
@@ -691,18 +694,19 @@ function placeCaret(el) {
 }
 
 function topBar(nb) {
-  var open = db.tasks.filter(function (t) { return !t.done; });
+  var open = myTasks().filter(function (t) { return !t.done; });
   var waiting = open.filter(function (t) { return /^waiting/i.test(t.status); }).length;
-  var crumb = nb
+  var tv = isTaskView(), base = nb ? nb.name : 'Mind Chuck';
+  var crumb = nb && nb.id !== PID
     ? edit('div', 'crumb', nb.name, function (v) { if (v) patch('projects', nb.id, { name: v }); }, { ph: 'Project name' })
-    : h('div', { class: 'crumb', text: ui.archive ? 'Mind Chuck · Archive' : 'Mind Chuck' });
-  if (nb) crumb.id = 'crumb';
+    : h('div', { class: 'crumb', text: tv && ui.archive ? base + ' · Archive' : base });
+  if (nb && nb.id !== PID) crumb.id = 'crumb';
   return h('div', { class: 'top' },
     h('div', { class: 'brand', text: "OBI-WAN'S MIND PALACE" }),
     crumb,
     h('div', { class: 'spacer' }),
-    h('div', { class: 'stat', text: nb ? activeSub(nb) : open.length + ' open · ' + waiting + ' waiting' }),
-    nb || ui.archive ? null : h('button', { class: 'tbtn mob-only' + (checkedOnList().length ? ' on' : ''), title: 'Move checked tasks to the Archive',
+    h('div', { class: 'stat', text: !tv ? activeSub(nb) : open.length + ' open · ' + waiting + ' waiting' }),
+    !tv || ui.archive ? null : h('button', { class: 'tbtn mob-only' + (checkedOnList().length ? ' on' : ''), title: 'Move checked tasks to the Archive',
       text: 'Archive checked (' + checkedOnList().length + ')', onclick: archiveChecked }),
     h('button', { class: 'tbtn', id: 'syncbtn', title: 'Sync settings', onclick: openSettings, text: syncLabel() }),
     h('button', { class: 'tbtn', title: 'Light / dark', text: ui.theme === 'light' ? 'Dark' : 'Light',
@@ -749,16 +753,17 @@ function shiftTab(id, dir) {
   render();
 }
 function tabs(projects) {
-  var list = [{ id: 'mind', name: 'Mind Chuck' }].concat(projects);
+  var pers = find('projects', PID);
+  var list = [{ id: 'mind', name: 'Mind Chuck' }].concat(pers ? [pers] : [], projects.filter(function (p) { return p.id !== PID; }));
   return h('div', { class: 'tabs' },
     list.map(function (t) {
-      var isProj = t.id !== 'mind';
+      var isProj = t.id !== 'mind' && t.id !== PID;
       var el = h('div', { class: 'tab' + (ui.nav === t.id ? ' on' : ''), text: t.name || 'Untitled',
         draggable: isProj ? 'true' : null, title: isProj ? 'Double-click to rename · drag to reorder' : null,
         onclick: function () {
           if (el.isContentEditable) return;
           if (isProj && ui.nav === t.id) { renameTab(el, t); return; } // click the open tab again to rename
-          if (t.id === 'mind' && ui.nav === 'mind') ui.archive = false; // click Mind Chuck again = back to list
+          if (ui.nav === t.id || !isProj) ui.archive = false; // click Mind Chuck / Personal again = back to list
           ui.nav = t.id; saveUi(); render();
         },
         ondblclick: function () { if (isProj) renameTab(el, t); },
@@ -779,10 +784,10 @@ function tabs(projects) {
 
 function footer(nb) {
   var cells = nb ? [h('div', { class: 'fc', text: nb.name })] : [];
-  if (nb) cells.push(h('div', { class: 'fc', text: activeSub(nb) }));
+  if (nb && !isTaskView()) cells.push(h('div', { class: 'fc', text: activeSub(nb) }));
   else {
-    var arch = db.tasks.filter(function (t) { return t.archived; }).length;
-    var open = db.tasks.filter(function (t) { return !t.done; }).length;
+    var arch = myTasks().filter(function (t) { return t.archived; }).length;
+    var open = myTasks().filter(function (t) { return !t.done; }).length;
     cells.push(h('div', { class: 'fc', text: open + ' open · ' + checkedOnList().length + ' checked' }));
     cells.push(h('button', { class: 'fc btn', text: ui.archive ? '← Back to list' : 'Archive (' + arch + ')',
       onclick: function () { ui.archive = !ui.archive; saveUi(); render(); window.scrollTo(0, 0); } }));
@@ -826,7 +831,7 @@ document.addEventListener('keydown', function (e) {
 /* ---------------- Archive: every checked task, grouped by week closed (newest first) ---------------- */
 function fromIso(s) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
 function archiveView() {
-  var done = db.tasks.filter(function (t) { return t.archived; }).sort(function (a, b) {
+  var done = myTasks().filter(function (t) { return t.archived; }).sort(function (a, b) {
     return String(b.closed || '').localeCompare(String(a.closed || '')) || num(b.order) - num(a.order);
   });
   var groups = [], byKey = {};
@@ -871,9 +876,24 @@ function archiveRow(t) {
   );
 }
 
+/* ---------------- Personal space ----------------
+   A fixed 'Personal' tab (project id 'personal') with its own task list (tasks with List = personal),
+   plus Dashboard (kanban + notebook) and any subsheets you add. Never mixes with Mind Chuck. */
+var PID = 'personal';
+function ensurePersonal() {
+  if (!find('projects', PID)) put('projects', { id: PID, name: 'Personal', subs: 'Tasks|Dashboard', order: -1000000 });
+}
+function curList() { return ui.nav === PID ? 'personal' : ''; }
+function myTasks() { var l = curList(); return db.tasks.filter(function (t) { return (t.list || '') === l; }); }
+function isTaskView() {
+  if (ui.nav === 'mind') return true;
+  var p = ui.nav === PID && find('projects', PID);
+  return !!p && activeSub(p) === 'Tasks';
+}
+
 /* ---------------- Mind Chuck (task table) ---------------- */
 // Filter button: moves every checked task off the list and into the Archive
-function checkedOnList() { return db.tasks.filter(function (t) { return t.done && !t.archived; }); }
+function checkedOnList() { return myTasks().filter(function (t) { return t.done && !t.archived; }); }
 function archiveChecked() {
   var list = checkedOnList();
   if (!list.length) return;
@@ -890,7 +910,7 @@ function filterBtn() {
 }
 function mindView() {
   if (ui.archive) return archiveView();
-  var tasks = db.tasks.slice().sort(byOrder).filter(function (t) { return !t.archived; });
+  var tasks = myTasks().sort(byOrder).filter(function (t) { return !t.archived; });
   return h('div', { class: 'mind' },
     h('div', { class: 'thead' },
       h('div', { class: 'th w-grip' }), h('div', { class: 'th w-chk hchk' }, filterBtn()),
@@ -1049,7 +1069,7 @@ function chuck() {
   put('tasks', {
     id: uid(), done: false, text: text.replace(/\s+/g, ' ').trim() || 'Untitled', note: (d.note || '').trim(),
     status: (d.status || '').trim() || (who ? 'Waiting' : ''), project: project, who: who, date: parseDue(date),
-    created: iso(today()), closed: '', order: max + 1
+    created: iso(today()), closed: '', order: max + 1, list: curList()
   });
   ui.draft = { text: '', status: '', project: '', who: '', date: '', note: '' };
   saveUi();
@@ -1081,7 +1101,7 @@ function projectView(nb) {
   var bar = h('div', { class: 'subbar' },
     subs.map(function (s) {
       return h('div', { class: 'pill' + (s === act ? ' on' : ''), text: s,
-        onclick: function () { ui.sub[nb.id] = s; saveUi(); render(); } });
+        onclick: function () { ui.sub[nb.id] = s; ui.archive = false; saveUi(); render(); } });
     }),
     h('div', { class: 'spacer' }),
     h('button', { class: 'chipbtn', text: '+ Subsheet', onclick: function () {
@@ -1091,16 +1111,16 @@ function projectView(nb) {
       if (subs.indexOf(n) < 0) patch('projects', nb.id, { subs: subs.concat([n]).join('|') });
       ui.sub[nb.id] = n; saveUi(); render();
     } }),
-    act !== 'Dashboard' ? h('button', { class: 'chipbtn quiet', text: 'Remove subsheet', onclick: function () {
+    act !== 'Dashboard' && act !== 'Tasks' ? h('button', { class: 'chipbtn quiet', text: 'Remove subsheet', onclick: function () {
       if (!confirm('Remove the "' + act + '" subsheet and everything on it?')) return;
       patch('projects', nb.id, { subs: subs.filter(function (s) { return s !== act; }).join('|') });
       db.rows.filter(function (r) { return r.project === nb.id && r.sub === act; }).forEach(function (r) { remove('rows', r.id); });
       if (act !== 'Meeting notes') db.notes.filter(function (r) { return r.project === nb.id && r.sub === act; }).forEach(function (r) { remove('notes', r.id); });
       ui.sub[nb.id] = 'Dashboard'; saveUi(); render();
     } }) : null,
-    h('button', { class: 'chipbtn quiet', title: 'Move tab left', text: '‹', onclick: function () { shiftTab(nb.id, -1); } }),
-    h('button', { class: 'chipbtn quiet', title: 'Move tab right', text: '›', style: 'margin-left:3px', onclick: function () { shiftTab(nb.id, 1); } }),
-    h('button', { class: 'chipbtn quiet', text: 'Delete project', onclick: function () {
+    nb.id === PID ? null : h('button', { class: 'chipbtn quiet', title: 'Move tab left', text: '‹', onclick: function () { shiftTab(nb.id, -1); } }),
+    nb.id === PID ? null : h('button', { class: 'chipbtn quiet', title: 'Move tab right', text: '›', style: 'margin-left:3px', onclick: function () { shiftTab(nb.id, 1); } }),
+    nb.id === PID ? null : h('button', { class: 'chipbtn quiet', text: 'Delete project', onclick: function () {
       if (!confirm('Delete "' + nb.name + '" and all of its cards, notes and subsheets?')) return;
       ['cards', 'notes', 'rows', 'submittals'].forEach(function (k) {
         db[k] = db[k].filter(function (r) { return r.project !== nb.id; });
@@ -1111,7 +1131,8 @@ function projectView(nb) {
     } })
   );
   var body;
-  if (act === 'Dashboard') body = [kanban(nb), submittalLog(nb), notebook(nb, noteKey(act))];
+  if (act === 'Tasks' && nb.id === PID) body = mindView();
+  else if (act === 'Dashboard') body = [kanban(nb), nb.id === PID ? null : submittalLog(nb), notebook(nb, noteKey(act))];
   else if (isNotebook(act)) body = notebook(nb, noteKey(act));
   else body = sheet(nb, act);
   return h('div', {}, bar, body);
@@ -1161,8 +1182,11 @@ function card(c, lead) {
     if (!v) { remember('cards', c.id, 'Card deleted'); remove('cards', c.id); return; }
     var s = splitWho(v, c.who); patch('cards', c.id, { text: s.text, who: s.who });
   }, { ph: 'Card', spell: true });
-  txt.addEventListener('focus', function () { el.draggable = false; });
-  txt.addEventListener('blur', function () { el.draggable = true; });
+  var note = edit('div', 'knote', c.note, function (v) { remember('cards', c.id, 'Note edited'); patch('cards', c.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true, rich: true });
+  [txt, note].forEach(function (x) {
+    x.addEventListener('focus', function () { el.draggable = false; });
+    x.addEventListener('blur', function () { el.draggable = true; });
+  });
   var ci = COLS.map(function (x) { return x.key; }).indexOf(c.col || 'open');
   var next = COLS[(ci + 1) % COLS.length];
   add(el, [
@@ -1171,6 +1195,7 @@ function card(c, lead) {
       h('button', { title: 'Delete', text: '×', onclick: function () { remember('cards', c.id, 'Card deleted'); remove('cards', c.id); render(); } })
     ),
     txt,
+    note,
     c.who ? h('div', { class: 'kwho' }, 'Waiting on ', edit('span', '', c.who, function (v) { patch('cards', c.id, { who: v }); }, { ph: 'name' })) : null
   ]);
   return el;
@@ -1417,7 +1442,7 @@ function caretAt(el, end) {
 document.addEventListener('keydown', function (e) {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
   var el = e.target;
-  if (!el || !el.getAttribute || ui.nav !== 'mind' || ui.archive) return;
+  if (!el || !el.getAttribute || !isTaskView() || ui.archive) return;
   var rows = gridRows();
   // nothing selected
   if (el === document.body) {
@@ -1470,7 +1495,7 @@ document.addEventListener('keydown', function (e) {
       break;
   }
 }, true);
-if (!cfg.url) migrateOrder();
+if (!cfg.url) { migrateOrder(); ensurePersonal(); }
 render();
 if (cfg.url) { flush(); pull(); } else setSync('local');
 setInterval(function () { if (!document.hidden) pull(); }, POLL_MS);
