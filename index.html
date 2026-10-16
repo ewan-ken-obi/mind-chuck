@@ -695,7 +695,7 @@ function placeCaret(el) {
 
 function topBar(nb) {
   var open = myTasks().filter(function (t) { return !t.done; });
-  var waiting = open.filter(function (t) { return /^waiting/i.test(t.status); }).length;
+  var waiting = open.filter(function (t) { return /waiting/i.test(t.status); }).length;
   var tv = isTaskView(), base = nb ? nb.name : 'Mind Chuck';
   var crumb = nb && nb.id !== PID
     ? edit('div', 'crumb', nb.name, function (v) { if (v) patch('projects', nb.id, { name: v }); }, { ph: 'Project name' })
@@ -986,7 +986,7 @@ function taskRow(t, list, idx) {
 }
 
 var CAP_ORDER = ['text', 'status', 'project', 'who', 'date', 'note'];
-var STATUSES = ['Waiting', 'In progress', 'Almost done', 'Done'];
+var STATUSES = ['Not started', 'In progress', 'Waiting', 'Sent — waiting', 'Blocked', 'On hold', 'Almost done', 'Done'];
 // Status dropdown. Edit STATUSES above to change the choices.
 function statusSelect(value, emptyLabel, onChange) {
   value = value || '';
@@ -1105,7 +1105,7 @@ function projectView(nb) {
     }),
     h('div', { class: 'spacer' }),
     h('button', { class: 'chipbtn', text: '+ Subsheet', onclick: function () {
-      var n = prompt('Name for the new subsheet.\nEnd the name with "notes" to make it a notebook page (e.g. "Site notes").');
+      var n = prompt('Name for the new subsheet (e.g. "OAC meeting", "Factory call").\nEach subsheet is its own dated journal.');
       n = (n || '').replace(/\|/g, '/').trim();
       if (!n) return;
       if (subs.indexOf(n) < 0) patch('projects', nb.id, { subs: subs.concat([n]).join('|') });
@@ -1133,8 +1133,11 @@ function projectView(nb) {
   var body;
   if (act === 'Tasks' && nb.id === PID) body = mindView();
   else if (act === 'Dashboard') body = [kanban(nb), nb.id === PID ? null : submittalLog(nb), notebook(nb, noteKey(act))];
-  else if (isNotebook(act)) body = notebook(nb, noteKey(act));
-  else body = sheet(nb, act);
+  else {
+    // Every subsheet is a dated journal (like Meeting notes). Any older line-list rows still show underneath.
+    var legacy = db.rows.some(function (r) { return r.project === nb.id && r.sub === act; });
+    body = [notebook(nb, noteKey(act)), legacy ? sheet(nb, act) : null];
+  }
   return h('div', {}, bar, body);
 }
 
