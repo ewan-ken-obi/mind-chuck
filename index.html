@@ -49,14 +49,22 @@ a{color:var(--accent)}
 
 /* ---------- frame ---------- */
 .shell{min-height:100vh;padding:12px;display:flex;justify-content:center}
-.frame{width:100%;max-width:1600px;border:1px solid var(--line);border-radius:12px;overflow:clip;background:var(--panel);box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:calc(100vh - 24px)}
+.frame{width:100%;max-width:1600px;border:1px solid var(--line);border-radius:0;overflow:clip;background:var(--panel);display:flex;flex-direction:column;min-height:calc(100vh - 24px)}
 .top{display:flex;align-items:center;gap:8px;background:var(--bar);padding:13px 16px;border-bottom:1px solid var(--line)}
 .brand{font:600 15px/1 var(--f);letter-spacing:-.01em;white-space:nowrap}
 .crumb{font:600 13px/1 var(--f);color:var(--accent);padding:3px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
 .spacer{flex:1}
 .stat{font:500 12.5px/1 var(--f);color:var(--ink3);white-space:nowrap}
-.tbtn{border:1px solid var(--line);background:transparent;color:var(--ink3);font:500 11.5px/1 var(--f);border-radius:999px;padding:5px 10px;cursor:pointer;white-space:nowrap}
+.tbtn{border:1px solid var(--line);background:transparent;color:var(--ink3);font:500 11.5px/1 var(--f);border-radius:5px;padding:5px 10px;cursor:pointer;white-space:nowrap}
 .mob-only{display:none}
+.ic{display:inline-flex;align-items:center;justify-content:center;line-height:0;vertical-align:middle}
+.week{font:500 12.5px/1 var(--f);color:var(--ink3);white-space:nowrap;margin-right:6px}
+.deskbtns{display:flex;gap:6px}
+.mmenu{display:none;position:relative}
+.iconbtn{border:1px solid var(--line);background:transparent;color:var(--ink2);border-radius:5px;padding:4px 5px;cursor:pointer;display:flex}
+.mpanel{display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:50;flex-direction:column;gap:6px;padding:8px;background:var(--raised);border:1px solid var(--line2);border-radius:6px;min-width:170px}
+.mmenu.open .mpanel{display:flex}.mpanel .tbtn{text-align:left;padding:8px 10px;font-size:13px}
+.nbhead .fmt{visibility:hidden}.box:focus-within .nbhead .fmt{visibility:visible}
 .hchk{display:flex;align-items:center;justify-content:center;padding:0!important;border-left:0!important}
 .eyebtn{border:0;background:transparent;color:var(--ink4);cursor:pointer;padding:2px;display:flex;border-radius:4px}
 .eyebtn:hover{color:var(--ink);background:var(--hover)}
@@ -82,7 +90,7 @@ a{color:var(--accent)}
 .th{padding:8px 10px;font:600 12.5px/1 var(--f);color:var(--ink);border-left:1px solid var(--soft)}
 .w-grip{width:26px;flex:none}.w-chk{width:22px;flex:none}
 .w-main{flex:1;min-width:0}
-.w-status{width:132px;flex:none}.w-project{width:100px;flex:none}.w-who{width:96px;flex:none}.w-date{width:84px;flex:none}.w-x{width:28px;flex:none}
+.w-status{width:132px;flex:none}.w-project{width:100px;flex:none}.w-who{width:96px;flex:none}.w-date{width:98px;flex:none}.w-x{width:28px;flex:none}
 .thead .w-grip,.thead .w-chk,.thead .w-x{border-left:0;padding:0}
 .row{display:flex;align-items:stretch;border-bottom:1px solid var(--rule);background:var(--panel)}
 .mind>.row:hover{background:var(--hover)}
@@ -93,7 +101,7 @@ a{color:var(--accent)}
 .pbar:hover{background:var(--accent);opacity:.35}
 .row.prio .pbar:hover{opacity:0}
 .row.dropping{box-shadow:inset 0 2px 0 var(--accent)}
-.grip{padding:13px 0 0 8px;opacity:.35;font:400 12px/1 var(--f);color:var(--ink4);cursor:grab;user-select:none}
+.grip{padding:11px 0 0 6px;opacity:0;font:400 12px/1 var(--f);color:var(--ink4);cursor:grab;user-select:none}
 .row:hover .grip{opacity:1}
 .chkcell{display:flex;align-items:flex-start;padding-top:12px}
 .chk{width:17px;height:17px;flex:none;border-radius:4px;border:1.5px solid var(--accent);background:var(--card);display:flex;align-items:center;justify-content:center;font:600 10px/1 var(--f);color:transparent;cursor:pointer;padding:0}
@@ -153,9 +161,9 @@ option{background:var(--panel);color:var(--ink)}
 /* ---------- project pages ---------- */
 .subbar{display:flex;align-items:center;padding:7px 10px;background:var(--bar);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;gap:3px}
 .subbar::-webkit-scrollbar{display:none}
-.pill{padding:7px 13px;cursor:pointer;border-radius:999px;border:1px solid var(--line);background:transparent;font:500 13.5px/1 var(--f);color:var(--ink2);white-space:nowrap}
+.pill{padding:7px 13px;cursor:pointer;border-radius:5px;border:1px solid var(--line);background:transparent;font:500 13.5px/1 var(--f);color:var(--ink2);white-space:nowrap}
 .pill.on{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
-.chipbtn{font:500 11.5px/1 var(--f);color:var(--ink2);border:1px solid var(--line2);background:var(--raised);border-radius:999px;padding:6px 12px;cursor:pointer;white-space:nowrap;margin-left:6px}
+.chipbtn{font:500 11.5px/1 var(--f);color:var(--ink2);border:1px solid var(--line2);background:var(--raised);border-radius:5px;padding:6px 12px;cursor:pointer;white-space:nowrap;margin-left:6px}
 .chipbtn.quiet{color:var(--ink3);border-color:var(--line);background:transparent}
 
 .kgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:14px 12px 6px}
@@ -164,9 +172,13 @@ option{background:var(--panel);color:var(--ink)}
 .khead{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--raised);border-bottom:1px solid var(--line);font:600 13px/1 var(--f);color:var(--ink3);letter-spacing:-.005em}
 .khead.lead{color:var(--ink)}
 .khead .n{font-weight:500;font-size:12px}
-.kbody{padding:9px;display:flex;flex-direction:column;gap:7px;min-height:230px}
-.kcard{position:relative;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:9px 11px 10px;cursor:grab;box-shadow:inset 3px 0 0 var(--line2)}
-.kcard.lead{box-shadow:inset 3px 0 0 var(--accent)}
+.kbody{padding:9px;display:flex;flex-direction:column;gap:7px;min-height:44px}
+.kcard{position:relative;border:1px solid var(--line);background:var(--card);border-radius:4px;padding:9px 11px 10px;cursor:grab}
+.kcard.k-solved .ktext,.kcard.k-solved .knote{color:var(--ink3)}
+.ktop{display:flex;align-items:flex-start;gap:6px}.ktop>.ic{flex:none;margin-top:2px;color:var(--ink3)}.ktop .ktext{flex:1;min-width:0}
+.kcard.k-solved .ktop>.ic{color:var(--accent)}
+.kplus{border:0;background:transparent;color:var(--ink3);cursor:pointer;padding:2px;margin:-4px -4px -4px 0;border-radius:4px;display:flex}.kplus:hover{color:var(--ink);background:var(--hover,rgba(127,127,127,.12))}
+.khead .n{margin-left:8px;font-weight:500;color:var(--ink4)}
 .ktext{font:400 13.5px/1.5 var(--f);color:var(--ink);padding-right:30px;word-break:break-word}
 .kwho{font:500 10px/1 var(--f);color:var(--ink3);margin-top:7px;letter-spacing:.03em}
 .knote{font:400 12px/1.5 var(--f);color:var(--ink3);margin-top:3px;white-space:pre-wrap;word-break:break-word;--base:var(--ink3)}
@@ -192,7 +204,7 @@ option{background:var(--panel);color:var(--ink)}
 
 .sbhead{display:flex;align-items:center;gap:8px;background:var(--bar);border-bottom:1px solid var(--line);padding:8px 10px}
 .sbhead .t{font:600 13px/1 var(--f)}.sbhead .n{font:500 12px/1 var(--f);color:var(--ink3)}
-.sbchip{font:500 11.5px/1 var(--f);color:var(--ink2);border:1px solid var(--line2);background:var(--raised);border-radius:999px;padding:6px 11px;cursor:pointer}
+.sbchip{font:500 11.5px/1 var(--f);color:var(--ink2);border:1px solid var(--line2);background:var(--raised);border-radius:5px;padding:6px 11px;cursor:pointer}
 .sbchip.on{border-color:var(--accent);color:var(--accent)}
 .sb{display:flex;align-items:stretch;border-bottom:1px solid var(--line)}
 .sb:hover{background:var(--hover)}
@@ -214,13 +226,13 @@ option{background:var(--panel);color:var(--ink)}
 .sb-days{width:60px;flex:none;text-align:right;color:var(--ink3)}
 .sb-x{order:10;width:28px;flex:none;border:0;background:transparent;color:var(--ink4);cursor:pointer;font:400 15px/1 var(--f);opacity:0;padding:10px 0 0}
 .sb:hover .sb-x{opacity:1}.sb-x:hover{color:var(--ink)}
-.sb.ours{box-shadow:inset 3px 0 0 var(--accent)}.sb.ours .sb-bic{color:var(--accent)}
-.sb .ok{color:var(--accent)}.sb .back{color:var(--over)}.sb-days.late{color:var(--over)}
+.sb.ours .sb-bic{color:var(--accent);font-weight:700}
+.sb-days.late{color:var(--over)}
 .sb.closed .sb-title,.sb.closed .sbc{color:var(--ink4)}
 .sbadd{padding:12px 10px;font:500 12px/1 var(--f);color:var(--ink3);cursor:pointer;letter-spacing:.04em}
 .nbhead{display:flex;align-items:center;gap:9px;background:var(--bar);border-bottom:1px solid var(--line);padding:6px 9px}
 .nbhead .lbl{font:600 12.5px/1 var(--f);color:var(--ink3)}
-.newbtn{border:1px solid var(--line2);background:var(--accent);color:var(--accent-ink);font:600 12.5px/1 var(--f);border-radius:999px;padding:6px 13px;cursor:pointer}
+.newbtn{border:1px solid var(--line2);background:var(--accent);color:var(--accent-ink);font:600 12.5px/1 var(--f);border-radius:5px;padding:6px 13px;cursor:pointer}
 .entry{display:flex;border-bottom:1px solid var(--line)}
 .edate{width:116px;flex:none;padding:13px 12px 12px 10px;font:500 12.5px/1.5 var(--f);color:var(--ink3);letter-spacing:.04em;border-right:1px solid var(--line)}
 .ebody{flex:1;min-width:0;padding:10px 18px 14px;font:400 15px/1.7 var(--f);color:var(--ink);white-space:pre-wrap;word-break:break-word;cursor:text}
@@ -270,6 +282,7 @@ option{background:var(--panel);color:var(--ink)}
   .top>.tbtn{order:2}
   .top::after{content:"";order:1;flex-basis:100%;height:0}
   .mob-only{display:inline-block}
+  .deskbtns{display:none}.mmenu{display:block}.week{font-size:11.5px}
   .tabs{padding:0 8px}
   .tab{font-size:13px;padding:11px 1px 9px;margin-right:16px}
   .thead{display:none}
@@ -437,6 +450,7 @@ function flush() {
 function normalize(kind, r) {
   var o = {};
   for (var k in r) o[k] = r[k] == null ? '' : String(r[k]);
+  if (kind === 'tasks' && o.status === 'Sent — waiting') o.status = 'Sent, waiting';
   if (kind === 'tasks') { o.done = /^true$/i.test(o.done); o.archived = /^true$/i.test(o.archived); o.priority = /^true$/i.test(o.priority); }
   o.order = num(o.order);
   return o;
@@ -476,11 +490,11 @@ function setSync(s) {
 function syncLabel() {
   var n = queue.length + (inflight ? 1 : 0);
   switch (sync.state) {
-    case 'local': return 'Local only · Connect';
+    case 'local': return 'Connect';
     case 'saving': return 'Saving…';
     case 'loading': return 'Syncing…';
-    case 'offline': return 'Offline' + (n ? ' · ' + n + ' unsaved' : '');
-    case 'badkey': return 'Wrong key · Fix';
+    case 'offline': return 'Offline' + (n ? ', ' + n + ' unsaved' : '');
+    case 'badkey': return 'Wrong key';
     case 'backend': return 'Update Code.gs + run setup';
     default: return sync.at ? 'Synced ' + sync.at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : 'Synced';
   }
@@ -653,6 +667,27 @@ function htmlToMd(root) {
   }).join('');
   return out.replace(/^\n/, '');
 }
+/* Icons (Lucide, MIT) — stroke icons that follow the text colour */
+var ICONS = {
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  left: '<path d="m15 18-6-6 6-6"/>',
+  right: '<path d="m9 18 6-6-6-6"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  menu: '<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',
+  grip: '<circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/>',
+  help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+  done: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  dot: '<circle cx="12" cy="12" r="4" fill="currentColor"/>'
+};
+function icon(name, size) {
+  var sp = document.createElement('span'); sp.className = 'ic';
+  sp.innerHTML = '<svg viewBox="0 0 24 24" width="' + (size || 14) + '" height="' + (size || 14) + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[name] + '</svg>';
+  return sp;
+}
+document.addEventListener('click', function (e) {
+  if (ui.menuOpen && !e.target.closest('.mmenu')) { ui.menuOpen = false; render(); }
+});
 function isEditing() {
   var a = document.activeElement, app = document.getElementById('app');
   return !!(a && app.contains(a) && (a.isContentEditable || a.tagName === 'INPUT' || a.tagName === 'SELECT' || a.hasAttribute('data-col')));
@@ -694,23 +729,24 @@ function placeCaret(el) {
 }
 
 function topBar(nb) {
-  var open = myTasks().filter(function (t) { return !t.done; });
-  var waiting = open.filter(function (t) { return /waiting/i.test(t.status); }).length;
-  var tv = isTaskView(), base = nb ? nb.name : 'Mind Chuck';
-  var crumb = nb && nb.id !== PID
-    ? edit('div', 'crumb', nb.name, function (v) { if (v) patch('projects', nb.id, { name: v }); }, { ph: 'Project name' })
-    : h('div', { class: 'crumb', text: tv && ui.archive ? base + ' · Archive' : base });
-  if (nb && nb.id !== PID) crumb.id = 'crumb';
+  var tv = isTaskView();
+  var archBtn = tv && !ui.archive ? h('button', { class: 'tbtn', title: 'Move checked tasks to the Archive',
+    text: 'Archive checked (' + checkedOnList().length + ')', onclick: archiveChecked }) : null;
+  var sync = h('button', { class: 'tbtn', id: 'syncbtn', title: 'Sync settings', onclick: openSettings, text: syncLabel() });
+  var theme = h('button', { class: 'tbtn', title: 'Light / dark', text: ui.theme === 'light' ? 'Dark' : 'Light',
+    onclick: function () { ui.theme = ui.theme === 'light' ? 'dark' : 'light'; saveUi(); render(); } });
+  // phone: the three buttons live in one menu
+  var menu = h('div', { class: 'mmenu' + (ui.menuOpen ? ' open' : '') },
+    h('button', { class: 'iconbtn', title: 'Menu', onclick: function () { ui.menuOpen = !ui.menuOpen; render(); } }, icon('menu', 18)),
+    h('div', { class: 'mpanel' }, archBtn ? h('button', { class: 'tbtn', text: archBtn.textContent, onclick: function () { ui.menuOpen = false; archiveChecked(); } }) : null,
+      h('button', { class: 'tbtn', text: syncLabel(), onclick: function () { ui.menuOpen = false; render(); openSettings(); } }),
+      h('button', { class: 'tbtn', text: ui.theme === 'light' ? 'Dark' : 'Light', onclick: function () { ui.menuOpen = false; ui.theme = ui.theme === 'light' ? 'dark' : 'light'; saveUi(); render(); } })));
   return h('div', { class: 'top' },
     h('div', { class: 'brand', text: "OBI-WAN'S MIND PALACE" }),
-    crumb,
     h('div', { class: 'spacer' }),
-    h('div', { class: 'stat', text: !tv ? activeSub(nb) : open.length + ' open · ' + waiting + ' waiting' }),
-    !tv || ui.archive ? null : h('button', { class: 'tbtn mob-only' + (checkedOnList().length ? ' on' : ''), title: 'Move checked tasks to the Archive',
-      text: 'Archive checked (' + checkedOnList().length + ')', onclick: archiveChecked }),
-    h('button', { class: 'tbtn', id: 'syncbtn', title: 'Sync settings', onclick: openSettings, text: syncLabel() }),
-    h('button', { class: 'tbtn', title: 'Light / dark', text: ui.theme === 'light' ? 'Dark' : 'Light',
-      onclick: function () { ui.theme = ui.theme === 'light' ? 'dark' : 'light'; saveUi(); render(); } })
+    h('div', { class: 'week', text: 'Week ' + isoWeek(new Date()) }),
+    h('div', { class: 'deskbtns' }, sync, theme),
+    menu
   );
 }
 
@@ -759,7 +795,7 @@ function tabs(projects) {
     list.map(function (t) {
       var isProj = t.id !== 'mind' && t.id !== PID;
       var el = h('div', { class: 'tab' + (ui.nav === t.id ? ' on' : ''), text: t.name || 'Untitled',
-        draggable: isProj ? 'true' : null, title: isProj ? 'Double-click to rename · drag to reorder' : null,
+        draggable: isProj ? 'true' : null, title: isProj ? 'Double-click to rename, drag to reorder' : null,
         onclick: function () {
           if (el.isContentEditable) return;
           if (isProj && ui.nav === t.id) { renameTab(el, t); return; } // click the open tab again to rename
@@ -783,18 +819,11 @@ function tabs(projects) {
 }
 
 function footer(nb) {
-  var cells = nb ? [h('div', { class: 'fc', text: nb.name })] : [];
-  if (nb && !isTaskView()) cells.push(h('div', { class: 'fc', text: activeSub(nb) }));
-  else {
-    var arch = myTasks().filter(function (t) { return t.archived; }).length;
-    var open = myTasks().filter(function (t) { return !t.done; }).length;
-    cells.push(h('div', { class: 'fc', text: open + ' open · ' + checkedOnList().length + ' checked' }));
-    cells.push(h('button', { class: 'fc btn', text: ui.archive ? '← Back to list' : 'Archive (' + arch + ')',
+  if (!isTaskView()) return null;
+  var arch = myTasks().filter(function (t) { return t.archived; }).length;
+  return h('div', { class: 'foot' },
+    h('button', { class: 'fc btn', text: ui.archive ? '← Back to list' : 'Archive (' + arch + ')',
       onclick: function () { ui.archive = !ui.archive; saveUi(); render(); window.scrollTo(0, 0); } }));
-  }
-  cells.push(h('div', { class: 'spacer' }));
-  cells.push(h('div', { class: 'fc r', text: 'Week ' + isoWeek(new Date()) }));
-  return h('div', { class: 'foot' }, cells);
 }
 
 /* ---------------- Undo (Ctrl+Z, or the Undo button in the pop-up) ---------------- */
@@ -844,14 +873,14 @@ function archiveView() {
   return h('div', { class: 'mind' },
     h('div', { class: 'thead' },
       h('div', { class: 'th w-grip' }), h('div', { class: 'th w-chk' }),
-      h('div', { class: 'th w-main', text: 'Archive — checked tasks' }),
+      h('div', { class: 'th w-main', text: 'Archive' }),
       h('div', { class: 'th w-project', text: 'Project' }),
       h('div', { class: 'th w-who', text: 'Who' }),
       h('div', { class: 'th w-date', text: 'Closed' }),
       h('div', { class: 'th w-x' })
     ),
     groups.length ? groups.map(function (g) {
-      return [h('div', { class: 'agroup', text: g.label + '  ·  ' + g.items.length }), g.items.map(archiveRow)];
+      return [h('div', { class: 'agroup', text: g.label + ' (' + g.items.length + ')' }), g.items.map(archiveRow)];
     }) : h('div', { class: 'empty', text: 'Nothing checked off yet.' })
   );
 }
@@ -868,7 +897,7 @@ function archiveRow(t) {
     h('div', { class: 'main w-main' },
       h('div', { class: 'ttext', text: t.text }),
       t.note ? h('div', { class: 'tnote', text: t.note }) : null),
-    h('button', { class: 'x w-x', title: 'Delete for good', text: '×', onclick: function () { remember('tasks', t.id, 'Task deleted'); remove('tasks', t.id); render(); } }),
+    h('button', { class: 'x w-x', title: 'Delete for good', onclick: function () { remember('tasks', t.id, 'Task deleted'); remove('tasks', t.id); render(); } }, icon('x', 14)),
     h('div', { class: 'msp' }),
     h('div', { class: 'meta project w-project', text: t.project || '' }),
     h('div', { class: 'meta who w-who', text: t.who || '' }),
@@ -922,7 +951,7 @@ function mindView() {
       h('div', { class: 'th w-x' })
     ),
     tasks.length ? tasks.map(function (t, i) { return taskRow(t, tasks, i); })
-      : h('div', { class: 'empty', text: db.tasks.length ? 'All clear — nothing open.' : 'Nothing chucked yet. Type below and hit Enter.' }),
+      : h('div', { class: 'empty', text: db.tasks.length ? 'No open tasks.' : 'No tasks yet.' }),
     composer()
   );
 }
@@ -941,28 +970,28 @@ function taskRow(t, list, idx) {
       dragTask = null; render();
     }
   });
-  var grip = h('div', { class: 'grip w-grip', draggable: 'true', title: 'Drag to reorder', text: '⣿',
+  var grip = h('div', { class: 'grip w-grip', draggable: 'true', title: 'Drag to reorder',
     ondragstart: function (e) { dragTask = t.id; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', t.id); e.dataTransfer.setDragImage(row, 20, 16); } catch (x) {} },
     ondragend: function () { dragTask = null; }
-  });
+  }, icon('grip', 14));
   var chk = h('div', { class: 'chkcell w-chk' },
-    h('button', { class: 'chk' + (t.done ? ' on' : ''), title: t.done ? 'Mark open' : 'Mark done', text: '✓',
+    h('button', { class: 'chk' + (t.done ? ' on' : ''), title: t.done ? 'Mark open' : 'Mark done',
       onclick: function () {
         var d = !t.done;
         remember('tasks', t.id, d ? 'Task checked' : 'Task unchecked');
         patch('tasks', t.id, { done: d, status: d ? 'Done' : (/^done$/i.test(t.status) ? '' : t.status), closed: d ? iso(today()) : '' });
         focusAfter = '.row[data-id="' + t.id + '"] [data-col="chk"]';
         render(true);
-      } }));
+      } }, icon('check', 12)));
   var main = h('div', { class: 'main w-main' },
     edit('div', 'ttext', t.text, function (v) { if (v) { remember('tasks', t.id, 'Task edited'); patch('tasks', t.id, { text: v }); } else { remember('tasks', t.id, 'Task deleted'); remove('tasks', t.id); } }, { ph: 'Task', spell: true }),
     edit('div', 'tnote', t.note, function (v) { remember('tasks', t.id, 'Note edited'); patch('tasks', t.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true, rich: true })
   );
   // Thin strip on the far left: click to turn priority on/off (green bar)
-  var pbar = h('div', { class: 'pbar', title: t.priority ? 'Priority — click to remove' : 'Click to mark as priority',
+  var pbar = h('div', { class: 'pbar', title: t.priority ? 'Priority (click to remove)' : 'Click to mark as priority',
     onclick: function () { remember('tasks', t.id, t.priority ? 'Priority removed' : 'Marked priority'); patch('tasks', t.id, { priority: !t.priority }); render(true); } });
   add(row, [pbar, grip, chk, main,
-    h('button', { class: 'x w-x', title: 'Delete', text: '×', onclick: function () { remember('tasks', t.id, 'Task deleted'); remove('tasks', t.id); render(); } }),
+    h('button', { class: 'x w-x', title: 'Delete', onclick: function () { remember('tasks', t.id, 'Task deleted'); remove('tasks', t.id); render(); } }, icon('x', 14)),
     h('div', { class: 'msp' }),
     h('div', { class: 'meta status w-status' + (t.status ? ' set' : ' blank') }, statusSelect(t.status, '', function (v) {
       var d = /^done$/i.test(v);
@@ -986,7 +1015,7 @@ function taskRow(t, list, idx) {
 }
 
 var CAP_ORDER = ['text', 'status', 'project', 'who', 'date', 'note'];
-var STATUSES = ['Not started', 'In progress', 'Waiting', 'Sent — waiting', 'Blocked', 'On hold', 'Almost done', 'Done'];
+var STATUSES = ['Not started', 'In progress', 'Waiting', 'Sent, waiting', 'Blocked', 'On hold', 'Almost done', 'Done'];
 // Status dropdown. Edit STATUSES above to change the choices.
 function statusSelect(value, emptyLabel, onChange) {
   value = value || '';
@@ -1092,8 +1121,8 @@ function addProject() {
   put('projects', p);
   ui.nav = p.id; saveUi();
   render(true);
-  var c = document.getElementById('crumb');
-  if (c) { c.focus(); var r = document.createRange(); r.selectNodeContents(c); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  var el = document.querySelector('.tab.on');
+  if (el) renameTab(el, p);
 }
 
 function projectView(nb) {
@@ -1118,8 +1147,8 @@ function projectView(nb) {
       if (act !== 'Meeting notes') db.notes.filter(function (r) { return r.project === nb.id && r.sub === act; }).forEach(function (r) { remove('notes', r.id); });
       ui.sub[nb.id] = 'Dashboard'; saveUi(); render();
     } }) : null,
-    nb.id === PID ? null : h('button', { class: 'chipbtn quiet', title: 'Move tab left', text: '‹', onclick: function () { shiftTab(nb.id, -1); } }),
-    nb.id === PID ? null : h('button', { class: 'chipbtn quiet', title: 'Move tab right', text: '›', style: 'margin-left:3px', onclick: function () { shiftTab(nb.id, 1); } }),
+    nb.id === PID ? null : h('button', { class: 'chipbtn quiet', title: 'Move tab left', onclick: function () { shiftTab(nb.id, -1); } }, icon('left', 14)),
+    nb.id === PID ? null : h('button', { class: 'chipbtn quiet', title: 'Move tab right', style: 'margin-left:3px', onclick: function () { shiftTab(nb.id, 1); } }, icon('right', 14)),
     nb.id === PID ? null : h('button', { class: 'chipbtn quiet', text: 'Delete project', onclick: function () {
       if (!confirm('Delete "' + nb.name + '" and all of its cards, notes and subsheets?')) return;
       ['cards', 'notes', 'rows', 'submittals'].forEach(function (k) {
@@ -1155,14 +1184,14 @@ function kanban(nb) {
         if (!dragCard) return;
         moveCard(dragCard, col.key); dragCard = null; render();
       } },
-      h('div', { class: 'khead' + (lead ? ' lead' : '') }, col.title, h('div', { class: 'spacer' }), h('span', { class: 'n', text: '[' + list.length + ']' })),
-      h('div', { class: 'kbody' },
-        list.map(function (c) { return card(c, lead); }),
-        newCard && newCard.project === nb.id && newCard.col === col.key ? draftCard(nb, col.key, lead) : null,
-        h('button', { class: 'kadd', text: '+ Add', onclick: function () {
+      h('div', { class: 'khead' + (lead ? ' lead' : '') }, col.title, h('span', { class: 'n', text: String(list.length) }), h('div', { class: 'spacer' }),
+        h('button', { class: 'kplus', title: 'Add a card', onclick: function () {
           newCard = { project: nb.id, col: col.key };
           focusAfter = '.kcard.draft .ktext'; render(true);
-        } })
+        } }, icon('plus', 15))),
+      h('div', { class: 'kbody' },
+        newCard && newCard.project === nb.id && newCard.col === col.key ? draftCard(nb, col.key) : null,
+        list.map(function (c) { return card(c); })
       )
     );
     return colEl;
@@ -1177,8 +1206,8 @@ function moveCard(id, col) {
   var max = db.cards.reduce(function (a, c) { return Math.max(a, num(c.order)); }, 0);
   patch('cards', id, { col: col, order: max + 1 });
 }
-function card(c, lead) {
-  var el = h('div', { class: 'kcard' + (lead ? ' lead' : ''), draggable: 'true',
+function card(c) {
+  var el = h('div', { class: 'kcard k-' + (c.col || 'open'), draggable: 'true',
     ondragstart: function (e) { dragCard = c.id; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', c.id); } catch (x) {} },
     ondragend: function () { dragCard = null; } });
   var txt = edit('div', 'ktext', c.text, function (v) {
@@ -1194,24 +1223,24 @@ function card(c, lead) {
   var next = COLS[(ci + 1) % COLS.length];
   add(el, [
     h('div', { class: 'ktools' },
-      h('button', { title: 'Move to ' + next.title, text: '›', onclick: function () { moveCard(c.id, next.key); render(); } }),
-      h('button', { title: 'Delete', text: '×', onclick: function () { remember('cards', c.id, 'Card deleted'); remove('cards', c.id); render(); } })
+      h('button', { title: 'Move to ' + next.title, onclick: function () { moveCard(c.id, next.key); render(); } }, icon('right', 14)),
+      h('button', { title: 'Delete', onclick: function () { remember('cards', c.id, 'Card deleted'); remove('cards', c.id); render(); } }, icon('x', 14))
     ),
-    txt,
+    h('div', { class: 'ktop' }, c.col === 'solved' ? icon('done', 14) : c.col === 'questions' ? icon('help', 14) : null, txt),
     note,
     c.who ? h('div', { class: 'kwho' }, 'Waiting on ', edit('span', '', c.who, function (v) { patch('cards', c.id, { who: v }); }, { ph: 'name' })) : null
   ]);
   return el;
 }
-function draftCard(nb, colKey, lead) {
-  return h('div', { class: 'kcard draft' + (lead ? ' lead' : '') },
+function draftCard(nb, colKey) {
+  return h('div', { class: 'kcard draft' },
     edit('div', 'ktext', '', function (v) {
       newCard = null;
       if (!v) return;
       var s = splitWho(v, '');
       var max = db.cards.reduce(function (a, c) { return Math.max(a, num(c.order)); }, 0);
       put('cards', { id: uid(), project: nb.id, col: colKey, text: s.text, who: s.who, order: max + 1 });
-    }, { ph: 'Type, @name to wait on someone', spell: true }));
+    }, { ph: 'New card', spell: true }));
 }
 
 /* Submittal log (Dashboard, under the kanban) */
@@ -1235,7 +1264,7 @@ function submittalLog(nb) {
   return h('div', { class: 'pad' }, h('div', { class: 'box' },
     h('div', { class: 'sbhead' },
       h('div', { class: 't', text: 'Submittals' }),
-      h('div', { class: 'n', text: all.length + ' · ' + ours + ' in our court' }),
+      ours ? h('div', { class: 'n', text: ours + ' in our court' }) : null,
       h('div', { class: 'spacer' }),
       h('button', { class: 'sbchip' + (showAll ? '' : ' on'), text: 'Open', onclick: function () { ui.subAll[nb.id] = false; saveUi(); render(); } }),
       h('button', { class: 'sbchip' + (showAll ? ' on' : ''), text: 'All', onclick: function () { ui.subAll[nb.id] = true; saveUi(); render(); } })
@@ -1251,7 +1280,7 @@ function submittalLog(nb) {
         var d = newSub; newSub = null; if (!v) return;
         var max = db.submittals.reduce(function (a, x) { return Math.max(a, num(x.order)); }, 0);
         put('submittals', { id: uid(), project: nb.id, num: d.num, title: v, note: '', bic: 'Us', status: 'Preparing', since: md(today()), order: max + 1 });
-      }, { ph: 'Submittal title — Enter to add', spell: true }))) : null,
+      }, { ph: 'Submittal title', spell: true }))) : null,
     h('div', { class: 'sbadd', text: '+ New submittal', onclick: function () {
       var n = all.reduce(function (a, x) { var v = numVal(x.num); return v < 1e9 ? Math.max(a, v) : a; }, 0) + 1;
       newSub = { project: nb.id, num: String(n).padStart(2, '0') };
@@ -1268,7 +1297,7 @@ function submittalRow(x) {
   var st = h('select', { title: 'Status', onchange: function () { remember('submittals', x.id, 'Status changed'); stamp({ status: st.value }); render(); } },
     h('option', { value: '', text: '—' }), opts.map(function (o) { return h('option', { value: o, text: o }); }));
   st.value = x.status || '';
-  var stCls = /^approved/i.test(x.status || '') ? ' ok' : /^(revise|rejected)/i.test(x.status || '') ? ' back' : '';
+  var stCls = '';
   var sinceEl = edit('div', 'sbc sb-since', x.since, function (v) { patch('submittals', x.id, { since: parseDue(v) }); }, { ph: 'Date' });
   sinceEl.setAttribute('data-date', '');
   return h('div', { class: 'sb' + (subOurs(x) ? ' ours' : '') + (closed ? ' closed' : '') },
@@ -1279,7 +1308,7 @@ function submittalRow(x) {
         else { remember('submittals', x.id, 'Submittal deleted'); remove('submittals', x.id); }
       }, { ph: 'Submittal', spell: true }),
       edit('div', 'sb-note', x.note, function (v) { remember('submittals', x.id, 'Note edited'); patch('submittals', x.id, { note: v }); }, { ph: 'Add a note', multi: true, spell: true, rich: true })),
-    h('button', { class: 'sb-x', title: 'Delete', text: '×', onclick: function () { remember('submittals', x.id, 'Submittal deleted'); remove('submittals', x.id); render(); } }),
+    h('button', { class: 'sb-x', title: 'Delete', onclick: function () { remember('submittals', x.id, 'Submittal deleted'); remove('submittals', x.id); render(); } }, icon('x', 14)),
     bic,
     h('div', { class: 'sbc sb-st' + stCls }, st),
     sinceEl,
@@ -1336,13 +1365,11 @@ function notebook(nb, key) {
   var entries = db.notes.filter(function (n) { return n.project === nb.id && n.sub === key; })
     .sort(function (a, b) { return num(b.order) - num(a.order); });
   var label = longLabel(today());
-  function focusTop() { var el = document.querySelector('.entry.first .ebody'); if (el) { el.focus(); placeCaret(el); } }
   return h('div', { class: 'nbwrap' }, h('div', { class: 'box' },
     h('div', { class: 'nbhead' },
       h('div', { class: 'lbl', text: key === 'Meeting notes' ? 'Notebook' : key }),
       h('div', { class: 'spacer' }),
-      fmtBar(),
-      h('button', { class: 'newbtn', text: 'New entry', onclick: focusTop })
+      fmtBar()
     ),
     h('div', { class: 'entry first' },
       h('div', { class: 'edate', text: label }),
@@ -1351,18 +1378,14 @@ function notebook(nb, key) {
         var max = db.notes.reduce(function (a, x) { return Math.max(a, num(x.order)); }, 0);
         var nid = uid(); remember('notes', nid, 'Entry added');
         put('notes', { id: nid, project: nb.id, sub: key, date: label, body: v, order: max + 1 });
-      }, { multi: true, spell: true, rich: true, ph: 'Write here — it saves when you click away.' })
+      }, { multi: true, spell: true, rich: true, ph: 'New entry…' })
     ),
     entries.map(function (en) {
       return h('div', { class: 'entry' },
         edit('div', 'edate', en.date, function (v) { patch('notes', en.id, { date: v || en.date }); }, { ph: 'Date' }),
         edit('div', 'ebody', en.body, function (v) { remember('notes', en.id, v.trim() ? 'Entry edited' : 'Entry deleted'); if (v.trim()) patch('notes', en.id, { body: v }); else remove('notes', en.id); }, { multi: true, spell: true, rich: true })
       );
-    }),
-    h('div', { class: 'tail', onclick: focusTop },
-      h('div', { class: 'edate', text: '+' }),
-      h('div', { class: 'msg', text: 'keep writing — the page never ends…' })
-    )
+    })
   ));
 }
 
@@ -1380,7 +1403,7 @@ function openSettings() {
     onkeydown: function (e) { if (e.key === 'Escape') close(); } },
     h('div', { class: 'dlg' },
       h('h2', { text: 'Connect to your Google Sheet' }),
-      h('p', { text: 'Paste your Apps Script web app URL and key. They are saved in this browser only — do this once on each device.' }),
+      h('p', { text: 'Paste your Apps Script web app URL and key. They are saved in this browser only, so do this once on each device.' }),
       sync.err && sync.state !== 'idle' ? h('p', { style: 'color:var(--over)', text: 'Last error from the Sheet: ' + sync.err + ((queue.length + (inflight ? 1 : 0)) ? '  (' + (queue.length + (inflight ? 1 : 0)) + ' changes waiting)' : '') }) : null,
       h('label', { text: 'Web app URL' }), url,
       h('label', { text: 'Key' }), key,
